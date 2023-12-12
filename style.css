@@ -1,5 +1,6 @@
 body {
     background-color: lightblue;
+    font-family: 'Inconsolata', 'Arial', sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -7,6 +8,10 @@ body {
     height: 100vh;
     margin: 0;
     padding: 0;
+}
+
+button {
+    font-family: 'Inconsolata', 'Arial', sans-serif;
 }
 
 .slider-containers {
