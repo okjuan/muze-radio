@@ -41,22 +41,29 @@
         </div>
     </div>
     <div class="pills-container">
-        <input type="checkbox" id="pop" name="genre" value="pop">
+        <!-- TODO: add genres from Spotify's available genres:
+            - https://developer.spotify.com/documentation/web-api/reference/get-recommendation-genres
+        -->
+        <!-- TODO: limit max selected genres to 5
+            - see Spotify's seed_genres in https://developer.spotify.com/documentation/web-api/reference/get-recommendations
+        -->
+        <!-- TODO: set default genres (e.g. any?) and use that in the code instead of randomly picking 5 of Spotify's genres -->
+        <input type="checkbox" id="pop" class="genre" value="pop">
         <label for="pop" class="pill">Pop</label>
 
-        <input type="checkbox" id="rock" name="genre" value="rock">
+        <input type="checkbox" id="rock" class="genre" value="rock">
         <label for="rock" class="pill">Rock</label>
 
-        <input type="checkbox" id="hip-hop" name="genre" value="hip-hop">
+        <input type="checkbox" id="hip-hop" class="genre" value="hip-hop">
         <label for="hip-hop" class="pill">Hip Hop</label>
 
-        <input type="checkbox" id="country" name="genre" value="country">
+        <input type="checkbox" id="country" class="genre" value="country">
         <label for="country" class="pill">Country</label>
 
-        <input type="checkbox" id="jazz" name="genre" value="jazz">
+        <input type="checkbox" id="jazz" class="genre" value="jazz">
         <label for="jazz" class="pill">Jazz</label>
 
-        <input type="checkbox" id="classical" name="genre" value="classical">
+        <input type="checkbox" id="classical" class="genre" value="classical">
         <label for="classical" class="pill">Classical</label>
     </div>
 
