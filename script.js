@@ -29,8 +29,12 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   player.connect();
 
   document.getElementById('play-pause-button').onclick = function() {
-    player.togglePlay();
-    updatePlayPauseButton();
+    const audioFeatures = getSpotifyAudioFeatures();
+    console.log(audioFeatures);
+    //const recommendations = getRecommendations(audioFeatures);
+    //setPlayerQueue(recommendations, player);
+    //player.togglePlay();
+    //updatePlayPauseButton();
   };
 };
 
@@ -56,3 +60,9 @@ function updatePlayPauseButton() {
         playPauseButton.innerHTML = '<i class="fas fa-play"></i> Play';
     }
 };
+
+function getSpotifyAudioFeatures() {
+    var sliders = document.getElementsByClassName('slider');
+    var sliderValues = Array.from(sliders).map(slider => ({ [slider.name]: slider.value }));
+    return Object.assign({}, ...sliderValues);
+}
