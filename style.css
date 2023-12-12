@@ -1,0 +1,9 @@
+body {
+    background-color: lightblue;
+}
+.slider-container {
+    margin: 20px;
+}
+.slider-label {
+    margin-bottom: 10px;
+}
