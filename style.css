@@ -6,4 +6,8 @@ body {
 }
 .slider-label {
     margin-bottom: 10px;
+    display: inline-block; /* Allows the label to have a width and height */
+    width: 100px; /* Set a fixed width */
+    height: 25px; /* Set a fixed height */
+    text-align: center; /* Center the text within the label */
 }
