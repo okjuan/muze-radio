@@ -30,16 +30,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
 
   document.getElementById('play-pause-button').onclick = function() {
     player.togglePlay();
-    console.log("play/pause button clicked");
-    var playPauseButton = document.getElementById('play-pause-button');
-    const playPauseButtonState = playPauseButton.textContent.trim();
-    if (playPauseButtonState === 'Play') {
-        playPauseButton.textContent = 'Pause';
-        playPauseButton.innerHTML = '<i class="fas fa-pause"></i> Pause';
-    } else {
-        playPauseButton.textContent = 'Play';
-        playPauseButton.innerHTML = '<i class="fas fa-play"></i> Play';
-    }
+    updatePlayPauseButton();
   };
 };
 
@@ -52,3 +43,16 @@ for (var i = 0; i < sliders.length; i++) {
     // Trigger the event manually to display the initial value
     sliders[i].oninput();
 }
+
+function updatePlayPauseButton() {
+    console.log("play/pause button clicked");
+    var playPauseButton = document.getElementById('play-pause-button');
+    const playPauseButtonState = playPauseButton.textContent.trim();
+    if (playPauseButtonState === 'Play') {
+        playPauseButton.textContent = 'Pause';
+        playPauseButton.innerHTML = '<i class="fas fa-pause"></i> Pause';
+    } else {
+        playPauseButton.textContent = 'Play';
+        playPauseButton.innerHTML = '<i class="fas fa-play"></i> Play';
+    }
+};
