@@ -8,13 +8,44 @@ body {
     margin: 0;
     padding: 0;
 }
+
+.slider-containers {
+    width: 400px;
+}
+
 .slider-container {
     margin: 20px;
 }
+
 .slider-label {
     margin-bottom: 10px;
     display: inline-block; /* Allows the label to have a width and height */
     width: 100px; /* Set a fixed width */
     height: 25px; /* Set a fixed height */
     text-align: center; /* Center the text within the label */
+}
+
+.pills-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    width: 400px; /* Set a fixed width */
+    overflow-x: auto; /* Enable horizontal scrolling */
+    justify-content: center; /* Center the items horizontally */
+}
+
+.pills-container input[type="checkbox"] {
+    display: none;
+}
+
+.pills-container label {
+    padding: 10px 20px;
+    background-color: #ddd;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.pills-container input[type="checkbox"]:checked + label {
+    background-color: #feb1ff;
 }
