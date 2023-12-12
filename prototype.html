@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Music Dimension Control</title>
+    <style>
+        body {
+            background-color: lightblue;
+        }
+        .slider-container {
+            margin: 20px;
+        }
+        .slider-label {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slider-container">
+        <label class="slider-label">Obscure v.s. Popular</label>
+        <input type="range" min="1" max="100" value="50" class="slider" id="popularity">
+    </div>
+    <div class="slider-container">
+        <label class="slider-label">Low Energy v.s. High Energy</label>
+        <input type="range" min="1" max="100" value="50" class="slider" id="energy">
+    </div>
+    <div class="slider-container">
+        <label class="slider-label">Acousticness v.s. Electricness</label>
+        <input type="range" min="1" max="100" value="50" class="slider" id="acousticness">
+    </div>
+    <div class="slider-container">
+        <label class="slider-label">Quiet v.s. Loud</label>
+        <input type="range" min="1" max="100" value="50" class="slider" id="loudness">
+    </div>
+    <div class="slider-container">
+        <label class="slider-label">Vocal v.s. Instrumental</label>
+        <input type="range" min="1" max="100" value="50" class="slider" id="vocalness">
+    </div>
+
+    <script>
+        var sliders = document.getElementsByClassName('slider');
+        for (var i = 0; i < sliders.length; i++) {
+            sliders[i].oninput = function() {
+                console.log(this.id + ' value: ' + this.value);
+            }
+        }
+    </script>
+</body>
+</html>
