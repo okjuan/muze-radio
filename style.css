@@ -12,6 +12,7 @@ body {
 
 button {
     font-family: 'Inconsolata', 'Arial', sans-serif;
+    padding: 10px;
 }
 
 .slider-containers {
