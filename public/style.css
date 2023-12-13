@@ -17,6 +17,9 @@ button {
 
 .music-controls {
     padding: 3vh 0vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .sliders-container {
