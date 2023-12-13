@@ -6,6 +6,7 @@
     - [ ] with year of release
     - [ ] with a link to it on spotify
 - [ ] figure out how good of a job Spotify is doing at hitting the target audio features
+- [ ] do I need to randomize the recommendations? i get a lot of the same ones
 - [ ] have 2 knobs on sliders to allow custom range
 - [ ] add genres from Spotify's available genres: https://developer.spotify.com/documentation/web-api/reference/get-recommendation-genres
 - [ ] limit max selected genres to 5 (see Spotify's seed_genres in https://developer.spotify.com/documentation/web-api/reference/get-recommendations)
