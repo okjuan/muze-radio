@@ -1,8 +1,6 @@
 - [ ] publish the app!
 - [ ] add "like" button to add to library
 - [ ] add button to add to a playlist
-- [ ] create separate button for loading recommendations
-    - make this one the other one at the beginning; only show music control buttons when there is music playing
 - [ ] let user choose one of their playlists as a seed
 - [ ] show list of songs in queue
 - [ ] add ban button ("don't play this song again")

@@ -11,7 +11,6 @@ const clientSecret = 'TODO';
 const redirectUri = 'http://localhost:5000';
 const spotifyGenres = ["acoustic", "afrobeat", "alt-rock", "alternative", "ambient", "anime", "black-metal", "bluegrass", "blues", "bossanova", "brazil", "breakbeat", "british", "cantopop", "chicago-house", "children", "chill", "classical", "club", "comedy", "country", "dance", "dancehall", "death-metal", "deep-house", "detroit-techno", "disco", "disney", "drum-and-bass", "dub", "dubstep", "edm", "electro", "electronic", "emo", "folk", "forro", "french", "funk", "garage", "german", "gospel", "goth", "grindcore", "groove", "grunge", "guitar", "happy", "hard-rock", "hardcore", "hardstyle", "heavy-metal", "hip-hop", "holidays", "honky-tonk", "house", "idm", "indian", "indie", "indie-pop", "industrial", "iranian", "j-dance", "j-idol", "j-pop", "j-rock", "jazz", "k-pop", "kids", "latin", "latino", "malay", "mandopop", "metal", "metal-misc", "metalcore", "minimal-techno", "movies", "mpb", "new-age", "new-release", "opera", "pagode", "party", "philippines-opm", "piano", "pop", "pop-film", "post-dubstep", "power-pop", "progressive-house", "psych-rock", "punk", "punk-rock", "r-n-b", "rainy-day", "reggae", "reggaeton", "road-trip", "rock", "rock-n-roll", "rockabilly", "romance", "sad", "salsa", "samba", "sertanejo", "show-tunes", "singer-songwriter", "ska", "sleep", "songwriter", "soul", "soundtracks", "spanish", "study", "summer", "swedish", "synth-pop", "tango", "techno", "trance", "trip-hop", "turkish", "work-out", "world-music"];
 const maxSeedGenres = 5;
-var playerPaused = true;
 
 const shouldFetchNewToken = () => {
     if (!userAuthData) {
@@ -79,50 +78,58 @@ window.onSpotifyWebPlaybackSDKReady = () => {
       console.error(message);
   });
 
-  player.addListener('player_state_changed', ({ track_window: { current_track } }) => {
-    document.getElementById('currently-playing').style.display = '';
+  player.addListener('player_state_changed', ({ paused, track_window: { current_track } }) => {
+    updatePlayPauseButton(paused? 'Paused' : 'Playing');
+    var currentPlayingUpdated = false;
     if (currentlyPlaying.artist != current_track['artists'][0]['name']) {
         currentlyPlaying.artist = current_track['artists'][0]['name'];
         document.getElementById('artist-name-text').textContent = ` ${currentlyPlaying.artist}`;
+        currentPlayingUpdated = true;
     }
     if (currentlyPlaying.song != current_track['name']) {
         currentlyPlaying.song = current_track['name'];
         document.getElementById('song-name-text').textContent = ` ${currentlyPlaying.song}`;
+        currentPlayingUpdated = true;
     }
     if (currentlyPlaying.coverArtUrl != current_track['album']['images'][0]['url']) {
         currentlyPlaying.coverArtUrl = current_track['album']['images'][0]['url'];
         document.getElementById('cover-art').src = currentlyPlaying.coverArtUrl;
+        currentPlayingUpdated = true;
     }
     if (currentlyPlaying.album != current_track['album']['name']) {
         currentlyPlaying.album = current_track['album']['name'];
         document.getElementById('album-name-text').textContent = ` ${currentlyPlaying.album}`;
+        currentPlayingUpdated = true;
+    }
+    if (currentPlayingUpdated) {
+        document.getElementById('currently-playing').style.display = '';
     }
   });
 
   player.connect();
 
+  const generateRecommendationsButton = document.getElementById('recommendations-button');
+  generateRecommendationsButton.disabled = true;
+  generateRecommendationsButton.onclick = function() {
+    //updatePlayPauseButton('Loading');
+    this.disabled = true;
+    const audioFeatures = getSpotifyAudioFeatures();
+    console.log('audioFeatures', audioFeatures);
+    const genres = getSeedGenres(maxSeedGenres);
+    console.log('genres', genres);
+    getRecommendations(audioFeatures, genres).then(recommendations => {
+        console.log('recommendations', recommendations);
+        playSongs(player.device_id, recommendations['tracks'].map(track => track.uri));
+        //updatePlayPauseButton('Playing');
+    });
+    this.disabled = false;
+  };
+  generateRecommendationsButton.disabled = false;
+
   const playPauseButton = document.getElementById('play-pause-button');
   playPauseButton.disabled = true;
   playPauseButton.onclick = function() {
-    if (playerPaused) {
-        updatePlayPauseButton('Loading');
-        this.disabled = true;
-        const audioFeatures = getSpotifyAudioFeatures();
-        console.log('audioFeatures', audioFeatures);
-        const genres = getSeedGenres(maxSeedGenres);
-        console.log('genres', genres);
-        getRecommendations(audioFeatures, genres).then(recommendations => {
-            console.log('recommendations', recommendations);
-            playSongs(player.device_id, recommendations['tracks'].map(track => track.uri));
-            updatePlayPauseButton('Playing');
-            playerPaused = false;
-        });
-        this.disabled = false;
-    } else {
-        player.togglePlay();
-        updatePlayPauseButton('Paused');
-        playerPaused = true;
-    }
+    player.togglePlay();
   };
   playPauseButton.disabled = false;
 

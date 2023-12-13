@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>tinkertune</title>
     <link rel="stylesheet" type="text/css" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400&display=swap" rel="stylesheet">
@@ -18,12 +18,15 @@
             <p id="song-name"><i class="fas fa-music"></i><span id="song-name-text"></span></p>
             <p id="artist-name"><i class="fas fa-user"></i><span id="artist-name-text"></span></p>
             <p id="album-name"><i class="fas fa-compact-disc"></i><span id="album-name-text"></span></p>
+            <div class="music-controls">
+                <button id="previous-button" disabled><i class="fas fa-backward"></i> Previous</button>
+                <button id="play-pause-button" disabled><i class="fas fa-play"></i> Play</button>
+                <button id="next-button" disabled><i class="fas fa-forward"></i> Next</button>
+            </div>
         </div>
     </div>
     <div class="music-controls">
-        <button id="previous-button" disabled><i class="fas fa-backward"></i> Previous</button>
-        <button id="play-pause-button" disabled><i class="fas fa-play"></i> Play</button>
-        <button id="next-button" disabled><i class="fas fa-forward"></i> Next</button>
+        <button id="recommendations-button"><i class="fas fa-radio"></i> Tune</button>
     </div>
     <div class="main-container">
         <div class="sliders-container">
