@@ -1,0 +1,14 @@
+- [ ] publish the app!
+- [ ] allow user to specify language
+- [ ] allow user to specify date of release
+- [ ] show currently playing song
+    - [ ] with album artwork
+    - [ ] with year of release
+    - [ ] with a link to it on spotify
+- [ ] figure out how good of a job Spotify is doing at hitting the target audio features
+- [ ] have 2 knobs on sliders to allow custom range
+- [ ] add genres from Spotify's available genres: https://developer.spotify.com/documentation/web-api/reference/get-recommendation-genres
+- [ ] limit max selected genres to 5 (see Spotify's seed_genres in https://developer.spotify.com/documentation/web-api/reference/get-recommendations)
+- [ ] set default genres (e.g. any?) and use that in the code instead of randomly picking 5 of Spotify's genres
+- [ ] in `getRecommendations`: throw error if genres is empty or greater than 5 in length
+- [ ] in `getSpotifyWebAPIBearerToken`: cache token and expiry time; if called again, try to use cached token
