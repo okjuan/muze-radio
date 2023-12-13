@@ -83,7 +83,7 @@ function getSpotifyAudioFeatures() {
 }
 
 function getSeedGenres(count) {
-    const selectedGenres = getSelectedGenres();
+    const selectedGenres = getSelectedGenres().filter(a => spotifyGenres.some(b => a.toLowerCase().trim() === b.toLowerCase().trim()));
     var seedGenres;
     if (selectedGenres.length > 0) {
         seedGenres = selectedGenres.slice(0, count);

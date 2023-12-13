@@ -41,13 +41,9 @@
         </div>
     </div>
     <div class="pills-container">
-        <!-- TODO: add genres from Spotify's available genres:
-            - https://developer.spotify.com/documentation/web-api/reference/get-recommendation-genres
-        -->
-        <!-- TODO: limit max selected genres to 5
-            - see Spotify's seed_genres in https://developer.spotify.com/documentation/web-api/reference/get-recommendations
-        -->
-        <!-- TODO: set default genres (e.g. any?) and use that in the code instead of randomly picking 5 of Spotify's genres -->
+        <input type="checkbox" id="Any" class="genre" value="Any" checked>
+        <label for="Any" class="pill">Any</label>
+
         <input type="checkbox" id="pop" class="genre" value="pop">
         <label for="pop" class="pill">Pop</label>
 
