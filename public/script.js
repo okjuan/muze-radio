@@ -49,12 +49,12 @@ if (shouldFetchNewToken()) {
 window.onSpotifyWebPlaybackSDKReady = () => {
     const player = new Spotify.Player({
       name: 'Web Playback SDK Quick Start Player',
-      getOAuthToken: cb => { cb(userAuthData['access_token']); },
-      volume: 0.5
+      getOAuthToken: cb => { cb(userAuthData['access_token']); }
     });
 
   player.addListener('ready', ({ device_id }) => {
     console.log('Ready with Device ID', device_id);
+    player.device_id = device_id;
   });
 
   player.addListener('not_ready', ({ device_id }) => {
@@ -87,7 +87,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
         console.log('genres', genres);
         getRecommendations(audioFeatures, genres).then(recommendations => {
             console.log('recommendations', recommendations);
-            playSongs(recommendations['tracks'].map(track => track.uri));
+            playSongs(player.device_id, recommendations['tracks'].map(track => track.uri));
             updatePlayPauseButton('Playing');
             playerPaused = false;
         });
@@ -101,8 +101,8 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   playPauseButton.disabled = false;
 };
 
-function playSongs(spotify_uris) {
-    fetch(`https://api.spotify.com/v1/me/player/play`, {
+function playSongs(device_id, spotify_uris) {
+    fetch(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
         method: 'PUT',
         body: JSON.stringify({ uris: spotify_uris }),
         headers: {
