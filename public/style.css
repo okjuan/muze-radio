@@ -36,7 +36,8 @@ button {
 }
 
 #song-info {
-    margin-left: 5vw;
+    margin-left: 2vw;
+    width: auto;
 }
 
 .sliders-container {
