@@ -17,6 +17,9 @@ button {
 
 .music-controls {
     padding: 3vh 0vw;
+}
+
+#currently-playing {
     display: flex;
     justify-content: center;
     align-items: center;
