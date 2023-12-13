@@ -15,3 +15,7 @@
 - [ ] in `getSpotifyWebAPIBearerToken`: cache token and expiry time; if called again, try to use cached token
 - [ ] fetch Spotify genres instead of having them hard-coded?
     - [ ] or fetch them when an unexpected error happens when we request a genres and Spotify doesn't recognize it
+- [ ] special behavior for 'Any' genre pill/checkbox:
+    - [x] enable by default
+    - [ ] disable if any other is enabled
+    - [ ] enable again if all others are disabled
