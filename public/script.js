@@ -24,7 +24,7 @@ const shouldFetchNewToken = () => {
 if (shouldFetchNewToken()) {
     if (!window.location.hash) {
         const encodedRedirectUri = encodeURIComponent(redirectUri);
-        const scopes = encodeURIComponent('user-read-private user-read-email user-modify-playback-state');
+        const scopes = encodeURIComponent('streaming user-read-private user-read-playback-state user-read-currently-playing user-read-email user-modify-playback-state');
         window.location.href = `https://accounts.spotify.com/authorize?response_type=token&client_id=${clientId}&scope=${scopes}&redirect_uri=${encodedRedirectUri}`;
     }
 
@@ -47,10 +47,9 @@ if (shouldFetchNewToken()) {
 }
 
 window.onSpotifyWebPlaybackSDKReady = () => {
-    const token = '[My access token]';
     const player = new Spotify.Player({
       name: 'Web Playback SDK Quick Start Player',
-      getOAuthToken: cb => { cb(token); },
+      getOAuthToken: cb => { cb(userAuthData['access_token']); },
       volume: 0.5
     });
 
