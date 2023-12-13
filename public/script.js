@@ -113,15 +113,6 @@ function playSongs(spotify_uris) {
     });
 }
 
-var sliders = document.getElementsByClassName('slider');
-for (var i = 0; i < sliders.length; i++) {
-    sliders[i].oninput = function() {
-            document.getElementById(this.id).textContent = this.value;
-    }
-    // Trigger the event manually to display the initial value
-    sliders[i].oninput();
-}
-
 function updatePlayPauseButton(newState) {
     var playPauseButton = document.getElementById('play-pause-button');
     if (newState === 'Playing') {
