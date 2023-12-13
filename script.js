@@ -42,10 +42,9 @@ window.onSpotifyWebPlaybackSDKReady = () => {
         console.log('audioFeatures', audioFeatures);
         const genres = getSeedGenres(maxSeedGenres);
         console.log('genres', genres);
-        const recommendations = getRecommendations(audioFeatures, genres).then(recommendations => {
+        getRecommendations(audioFeatures, genres).then(recommendations => {
             console.log('recommendations', recommendations);
-            setPlayerQueue(recommendations['tracks'], player);
-            player.togglePlay();
+            playSongs(recommendations['tracks'].map(track => track.uri));
             updatePlayPauseButton('Playing');
             playerPaused = false;
         });
@@ -58,6 +57,18 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   };
   playPauseButton.disabled = false;
 };
+
+function playSongs(spotify_uris) {
+    const token = undefined;
+    fetch(`https://api.spotify.com/v1/me/player/play`, {
+        method: 'PUT',
+        body: JSON.stringify({ uris: spotify_uris }),
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+    });
+}
 
 var sliders = document.getElementsByClassName('slider');
 for (var i = 0; i < sliders.length; i++) {
@@ -150,17 +161,4 @@ function getSpotifyWebAPIBearerToken() {
     })
     .then(response => response.json())
     .catch(error => console.error('Error:', error));
-}
-
-function setPlayerQueue(tracks, player) {
-    const uris = tracks.map(track => track.uri);
-    console.log("uris", uris);
-
-    // TODO: figure out how to clear queue and set new queue
-
-    // player.clearQueue(); <== this is not a function
-    //player.queue({ uris })  <== this is not a function
-    //.then(() => {
-    //    console.log('Track queued!');
-    //});
 }
