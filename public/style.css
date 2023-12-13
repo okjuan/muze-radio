@@ -37,6 +37,7 @@ button {
     gap: 10px;
     margin-bottom: 20px;
     width: 400px; /* Set a fixed width */
+    height: 400px;
     overflow-x: auto; /* Enable horizontal scrolling */
     justify-content: center; /* Center the items horizontally */
 }

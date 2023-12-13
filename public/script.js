@@ -101,6 +101,26 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   playPauseButton.disabled = false;
 };
 
+const genresContainer = document.querySelector('.pills-container');
+spotifyGenres.forEach(genre => {
+    if (!genresContainer.querySelector(`input[value="${genre}"]`)) {
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = genre;
+        checkbox.className = 'genre';
+        checkbox.value = genre;
+
+        // Create label
+        const label = document.createElement('label');
+        label.htmlFor = genre;
+        label.className = 'pill';
+        label.textContent = genre.charAt(0).toUpperCase() + genre.slice(1); // Capitalize genre
+
+        genresContainer.appendChild(checkbox);
+        genresContainer.appendChild(label);
+    }
+});
+
 function playSongs(device_id, spotify_uris) {
     fetch(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
         method: 'PUT',
