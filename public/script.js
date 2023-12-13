@@ -79,7 +79,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   });
 
   player.addListener('player_state_changed', ({ track_window: { current_track } }) => {
-    document.getElementById('currently-playing').style.display = 'block';
+    document.getElementById('currently-playing').style.display = '';
     if (currentlyPlaying.artist != current_track['artists'][0]['name']) {
         currentlyPlaying.artist = current_track['artists'][0]['name'];
         document.getElementById('artist-name').textContent = currentlyPlaying.artist;

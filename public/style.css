@@ -19,10 +19,24 @@ button {
     padding: 3vh 0vw;
 }
 
+#currently-playing {
+    display: flex;
+    align-items: center;
+}
+
 #cover-art-container {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+#cover-art {
+    width: 20vh;
+    height: 20vh;
+}
+
+#song-info {
+    margin-left: 5vw;
 }
 
 .sliders-container {
@@ -86,11 +100,6 @@ button {
     padding: 0px 5vw;
 }
 
-#cover-art {
-    width: 20vh;
-    height: 20vh;
-}
-
-#song-name, #artist-name {
+/* #song-name, #artist-name {
     text-align: center;
-}
+} */
