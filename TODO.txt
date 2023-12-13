@@ -4,6 +4,9 @@
 - [ ] create separate button for loading recommendations
     - make this one the other one at the beginning; only show music control buttons when there is music playing
 - [ ] let user choose one of their playlists as a seed
+- [ ] show list of songs in queue
+- [ ] add ban button ("don't play this song again")
+- [ ] add song progress bar that user can drag to skip
 - [ ] allow user to specify language
 - [ ] allow user to specify date of release
 - [ ] show currently playing song
