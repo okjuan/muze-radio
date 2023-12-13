@@ -82,11 +82,11 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     document.getElementById('currently-playing').style.display = '';
     if (currentlyPlaying.artist != current_track['artists'][0]['name']) {
         currentlyPlaying.artist = current_track['artists'][0]['name'];
-        document.getElementById('artist-name').textContent = currentlyPlaying.artist;
+        document.getElementById('artist-name-text').textContent = ` ${currentlyPlaying.artist}`;
     }
     if (currentlyPlaying.song != current_track['name']) {
         currentlyPlaying.song = current_track['name'];
-        document.getElementById('song-name').textContent = currentlyPlaying.song;
+        document.getElementById('song-name-text').textContent = ` ${currentlyPlaying.song}`;
     }
     if (currentlyPlaying.coverArtUrl != current_track['album']['images'][0]['url']) {
         currentlyPlaying.coverArtUrl = current_track['album']['images'][0]['url'];
