@@ -32,8 +32,12 @@ window.onSpotifyWebPlaybackSDKReady = () => {
 
   player.connect();
 
-  document.getElementById('play-pause-button').onclick = function() {
+  const playPauseButton = document.getElementById('play-pause-button');
+  playPauseButton.disabled = true;
+  playPauseButton.onclick = function() {
     if (playerPaused) {
+        updatePlayPauseButton('Loading');
+        this.disabled = true;
         const audioFeatures = getSpotifyAudioFeatures();
         console.log('audioFeatures', audioFeatures);
         const genres = getSeedGenres(maxSeedGenres);
@@ -42,15 +46,17 @@ window.onSpotifyWebPlaybackSDKReady = () => {
             console.log('recommendations', recommendations);
             setPlayerQueue(recommendations['tracks'], player);
             player.togglePlay();
-            updatePlayPauseButton();
+            updatePlayPauseButton('Playing');
             playerPaused = false;
         });
+        this.disabled = false;
     } else {
         player.togglePlay();
-        updatePlayPauseButton();
+        updatePlayPauseButton('Paused');
         playerPaused = true;
     }
   };
+  playPauseButton.disabled = false;
 };
 
 var sliders = document.getElementsByClassName('slider');
@@ -63,16 +69,19 @@ for (var i = 0; i < sliders.length; i++) {
     sliders[i].oninput();
 }
 
-function updatePlayPauseButton() {
+function updatePlayPauseButton(newState) {
     console.log("play/pause button clicked");
     var playPauseButton = document.getElementById('play-pause-button');
-    const playPauseButtonState = playPauseButton.textContent.trim();
-    if (playPauseButtonState === 'Play') {
+    if (newState === 'Playing') {
         playPauseButton.textContent = 'Pause';
         playPauseButton.innerHTML = '<i class="fas fa-pause"></i> Pause';
-    } else {
+    } else if (newState === 'Paused') {
         playPauseButton.textContent = 'Play';
         playPauseButton.innerHTML = '<i class="fas fa-play"></i> Play';
+    } else if (newState === 'Loading') {
+        playPauseButton.textContent = 'Loading';
+    } else {
+        throw new Error('Invalid play/pause button state: ' + newState);
     }
 };
 
