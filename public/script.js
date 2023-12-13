@@ -117,14 +117,12 @@ var sliders = document.getElementsByClassName('slider');
 for (var i = 0; i < sliders.length; i++) {
     sliders[i].oninput = function() {
             document.getElementById(this.id).textContent = this.value;
-            console.log(this.id + ' value: ' + this.value);
     }
     // Trigger the event manually to display the initial value
     sliders[i].oninput();
 }
 
 function updatePlayPauseButton(newState) {
-    console.log("play/pause button clicked");
     var playPauseButton = document.getElementById('play-pause-button');
     if (newState === 'Playing') {
         playPauseButton.textContent = 'Pause';
@@ -172,10 +170,8 @@ function getRecommendations(audioFeatures, genres) {
 }
 
 function requestRecommendations(token, queryParams) {
-    console.log('token', token);
     // e.g. target_popularity=100&target_energy=80&target_acousticness=80&target_loudness=50&target_instrumentalness=100
     console.log('queryParams', queryParams);
-
     return fetch(`https://api.spotify.com/v1/recommendations?${queryParams}`, {
         method: 'GET',
         headers: {
