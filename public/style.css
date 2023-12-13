@@ -19,7 +19,7 @@ button {
     padding: 3vh 0vw;
 }
 
-#currently-playing {
+#cover-art-container {
     display: flex;
     justify-content: center;
     align-items: center;
