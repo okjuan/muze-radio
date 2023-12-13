@@ -2,6 +2,7 @@ var userAuthData = undefined;
 var currentlyPlaying = {
     artist: undefined,
     song: undefined,
+    album: undefined,
     coverArtUrl: undefined
 };
 const expiryBufferInSeconds = 60 * 5;
@@ -91,6 +92,10 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     if (currentlyPlaying.coverArtUrl != current_track['album']['images'][0]['url']) {
         currentlyPlaying.coverArtUrl = current_track['album']['images'][0]['url'];
         document.getElementById('cover-art').src = currentlyPlaying.coverArtUrl;
+    }
+    if (currentlyPlaying.album != current_track['album']['name']) {
+        currentlyPlaying.album = current_track['album']['name'];
+        document.getElementById('album-name-text').textContent = ` ${currentlyPlaying.album}`;
     }
   });
 
