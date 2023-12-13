@@ -114,7 +114,7 @@ function getRecommendations(audioFeatures, genres) {
     queryParams += Object.entries(audioFeatures)
         .map(([key, value]) => `target_${key}=${value}`)
         .join('&');
-    return getBearerToken().then(token => requestRecommendations(token['access_token'], queryParams));
+    return getSpotifyWebAPIBearerToken().then(token => requestRecommendations(token['access_token'], queryParams));
 }
 
 function requestRecommendations(token, queryParams) {
@@ -132,7 +132,7 @@ function requestRecommendations(token, queryParams) {
     .catch(error => console.error('Error:', error));
 }
 
-function getBearerToken() {
+function getSpotifyWebAPIBearerToken() {
     var clientId = 'your-client-id'; // Replace with your client ID
     var clientSecret = 'your-client-secret'; // Replace with your client secret
 
