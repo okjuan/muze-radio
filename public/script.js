@@ -120,6 +120,20 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     }
   };
   playPauseButton.disabled = false;
+
+  const skipButton = document.getElementById('next-button');
+  skipButton.disabled = true;
+  skipButton.onclick = function() {
+      player.nextTrack();
+  };
+  skipButton.disabled = false;
+
+  const previousButton = document.getElementById('previous-button');
+  previousButton.disabled = true;
+  previousButton.onclick = function() {
+      player.previousTrack();
+  };
+  previousButton.disabled = false;
 };
 
 const genresContainer = document.querySelector('.pills-container');
