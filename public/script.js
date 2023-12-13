@@ -1,4 +1,9 @@
 var userAuthData = undefined;
+var currentlyPlaying = {
+    artist: undefined,
+    song: undefined,
+    coverArtUrl: undefined
+};
 const expiryBufferInSeconds = 60 * 5;
 const clientId = 'TODO';
 const clientSecret = 'TODO';
@@ -71,6 +76,22 @@ window.onSpotifyWebPlaybackSDKReady = () => {
 
   player.addListener('account_error', ({ message }) => {
       console.error(message);
+  });
+
+  player.addListener('player_state_changed', ({ track_window: { current_track } }) => {
+    document.getElementById('currently-playing').style.display = 'block';
+    if (currentlyPlaying.artist != current_track['artists'][0]['name']) {
+        currentlyPlaying.artist = current_track['artists'][0]['name'];
+        document.getElementById('artist-name').textContent = currentlyPlaying.artist;
+    }
+    if (currentlyPlaying.song != current_track['name']) {
+        currentlyPlaying.song = current_track['name'];
+        document.getElementById('song-name').textContent = currentlyPlaying.song;
+    }
+    if (currentlyPlaying.coverArtUrl != current_track['album']['images'][0]['url']) {
+        currentlyPlaying.coverArtUrl = current_track['album']['images'][0]['url'];
+        document.getElementById('cover-art').src = currentlyPlaying.coverArtUrl;
+    }
   });
 
   player.connect();
