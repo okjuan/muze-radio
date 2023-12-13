@@ -1,6 +1,50 @@
+var userAuthData = undefined;
+const expiryBufferInSeconds = 60 * 5;
+const clientId = 'TODO';
+const clientSecret = 'TODO';
+const redirectUri = 'http://localhost:5000';
 const spotifyGenres = ["acoustic", "afrobeat", "alt-rock", "alternative", "ambient", "anime", "black-metal", "bluegrass", "blues", "bossanova", "brazil", "breakbeat", "british", "cantopop", "chicago-house", "children", "chill", "classical", "club", "comedy", "country", "dance", "dancehall", "death-metal", "deep-house", "detroit-techno", "disco", "disney", "drum-and-bass", "dub", "dubstep", "edm", "electro", "electronic", "emo", "folk", "forro", "french", "funk", "garage", "german", "gospel", "goth", "grindcore", "groove", "grunge", "guitar", "happy", "hard-rock", "hardcore", "hardstyle", "heavy-metal", "hip-hop", "holidays", "honky-tonk", "house", "idm", "indian", "indie", "indie-pop", "industrial", "iranian", "j-dance", "j-idol", "j-pop", "j-rock", "jazz", "k-pop", "kids", "latin", "latino", "malay", "mandopop", "metal", "metal-misc", "metalcore", "minimal-techno", "movies", "mpb", "new-age", "new-release", "opera", "pagode", "party", "philippines-opm", "piano", "pop", "pop-film", "post-dubstep", "power-pop", "progressive-house", "psych-rock", "punk", "punk-rock", "r-n-b", "rainy-day", "reggae", "reggaeton", "road-trip", "rock", "rock-n-roll", "rockabilly", "romance", "sad", "salsa", "samba", "sertanejo", "show-tunes", "singer-songwriter", "ska", "sleep", "songwriter", "soul", "soundtracks", "spanish", "study", "summer", "swedish", "synth-pop", "tango", "techno", "trance", "trip-hop", "turkish", "work-out", "world-music"];
 const maxSeedGenres = 5;
 var playerPaused = true;
+
+const shouldFetchNewToken = () => {
+    if (!userAuthData) {
+        console.log('No token found');
+        return true;
+    }
+    const now = new Date();
+    if (userAuthData['expiresAt'].getTime() < now.getTime()) {
+        console.log('Token expired');
+        return true;
+    }
+    console.log('Cached token still good!');
+    return false;
+}
+
+if (shouldFetchNewToken()) {
+    if (!window.location.hash) {
+        const encodedRedirectUri = encodeURIComponent(redirectUri);
+        const scopes = encodeURIComponent('user-read-private user-read-email user-modify-playback-state');
+        window.location.href = `https://accounts.spotify.com/authorize?response_type=token&client_id=${clientId}&scope=${scopes}&redirect_uri=${encodedRedirectUri}`;
+    }
+
+    userAuthData = window.location.hash
+    .substring(1) // remove the '#'
+    .split('&') // split into key=value pairs
+    .reduce(function(initial, item) {
+        if (item) {
+        var parts = item.split('=');
+        initial[parts[0]] = decodeURIComponent(parts[1]);
+        }
+        return initial;
+    }, {});
+    window.history.replaceState(null, null, ' ');
+    const now = new Date();
+    userAuthData['expiresAt'] = new Date(now.getTime() + (userAuthData['expiresIn'] - expiryBufferInSeconds) * 1000);
+    console.log('userAuthData', userAuthData);
+} else {
+    console.log("Didn't fetch new token");
+}
 
 window.onSpotifyWebPlaybackSDKReady = () => {
     const token = '[My access token]';
@@ -59,13 +103,12 @@ window.onSpotifyWebPlaybackSDKReady = () => {
 };
 
 function playSongs(spotify_uris) {
-    const token = undefined;
     fetch(`https://api.spotify.com/v1/me/player/play`, {
         method: 'PUT',
         body: JSON.stringify({ uris: spotify_uris }),
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${userAuthData['access_token']}`
         },
     });
 }
@@ -144,9 +187,6 @@ function requestRecommendations(token, queryParams) {
 }
 
 function getSpotifyWebAPIBearerToken() {
-    var clientId = 'your-client-id'; // Replace with your client ID
-    var clientSecret = 'your-client-secret'; // Replace with your client secret
-
     var headers = new Headers();
     headers.append('Content-Type', 'application/x-www-form-urlencoded');
     headers.append('Authorization', 'Basic ' + btoa(clientId + ':' + clientSecret));
