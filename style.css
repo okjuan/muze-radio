@@ -53,5 +53,5 @@ button {
 }
 
 .pills-container input[type="checkbox"]:checked + label {
-    background-color: #feb1ff;
+    background-color: #92c5ff;
 }
