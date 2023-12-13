@@ -19,3 +19,4 @@
     - [x] enable by default
     - [ ] disable if any other is enabled
     - [ ] enable again if all others are disabled
+- [ ] show audio feature values for currently playing track
