@@ -110,8 +110,6 @@ function getSelectedGenres() {
 }
 
 function getRecommendations(audioFeatures, genres) {
-    // TODO: throw error if genres is empty or greater than 5 in length
-
     var queryParams = `seed_genres=${genres.join(',')}&`;
     queryParams += Object.entries(audioFeatures)
         .map(([key, value]) => `target_${key}=${value}`)
