@@ -6,7 +6,6 @@
 - [ ] add ban button ("don't play this song again")
 - [ ] add song progress bar that user can drag to skip
 - [ ] disable recommendations button until user makes a change to config (keep track of config state)
-- [ ] set recommendations to Loading disabled state until music plays
 - [ ] allow user to specify language
 - [ ] allow user to specify date of release
 - [ ] show currently playing song

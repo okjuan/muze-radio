@@ -80,7 +80,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   });
 
   player.addListener('player_state_changed', ({ paused, track_window: { current_track } }) => {
-    updatePlayPauseButton(paused? 'Paused' : 'Playing');
+    updateButtonIcon(paused? ['fas', 'fa-play'] : ['fas', 'fa-pause'], 'play-pause-button');
     var currentPlayingUpdated = false;
     if (currentlyPlaying.artist != current_track['artists'][0]['name']) {
         currentlyPlaying.artist = current_track['artists'][0]['name'];
@@ -112,7 +112,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   const generateRecommendationsButton = document.getElementById('recommendations-button');
   generateRecommendationsButton.disabled = true;
   generateRecommendationsButton.onclick = function() {
-    //updatePlayPauseButton('Loading');
+    updateButtonIcon(['fa-solid', 'fa-spinner', 'fa-spin'], 'recommendations-button');
     this.disabled = true;
     const audioFeatures = getSpotifyAudioFeatures();
     console.log('audioFeatures', audioFeatures);
@@ -121,7 +121,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     getRecommendations(audioFeatures, genres).then(recommendations => {
         console.log('recommendations', recommendations);
         playSongs(player.device_id, recommendations['tracks'].map(track => track.uri));
-        //updatePlayPauseButton('Playing');
+        updateButtonIcon(['fa-solid', 'fa-magnifying-glass'], 'recommendations-button', ' Search');
     });
     this.disabled = false;
   };
@@ -192,19 +192,9 @@ function playSongs(device_id, spotify_uris) {
     });
 }
 
-function updatePlayPauseButton(newState) {
-    var playPauseButton = document.getElementById('play-pause-button');
-    if (newState === 'Playing') {
-        playPauseButton.textContent = 'Pause';
-        playPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
-    } else if (newState === 'Paused') {
-        playPauseButton.textContent = 'Play';
-        playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
-    } else if (newState === 'Loading') {
-        playPauseButton.textContent = 'Loading';
-    } else {
-        throw new Error('Invalid play/pause button state: ' + newState);
-    }
+function updateButtonIcon(buttonClasses, buttonId, text="") {
+    var playPauseButton = document.getElementById(buttonId);
+    playPauseButton.innerHTML = `<i class="${buttonClasses.join(' ')}"></i>` + text;
 };
 
 function getSpotifyAudioFeatures() {
