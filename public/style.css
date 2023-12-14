@@ -18,6 +18,9 @@ button {
 #currently-playing {
     display: flex;
     align-items: center;
+}
+
+#recommendations-button-container {
     padding: 3vh 0vw;
 }
 
