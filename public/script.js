@@ -3,7 +3,9 @@ var currentlyPlaying = {
     artist: undefined,
     song: undefined,
     album: undefined,
-    coverArtUrl: undefined
+    coverArtUrl: undefined,
+    spotifyUri: undefined,
+    spotifyId: undefined,
 };
 const expiryBufferInSeconds = 60 * 5;
 const clientId = 'TODO';
@@ -29,7 +31,7 @@ const shouldFetchNewToken = () => {
 if (shouldFetchNewToken()) {
     if (!window.location.hash) {
         const encodedRedirectUri = encodeURIComponent(redirectUri);
-        const scopes = encodeURIComponent('streaming user-read-private user-read-playback-state user-read-currently-playing user-read-email user-modify-playback-state');
+        const scopes = encodeURIComponent('streaming user-read-private user-read-playback-state user-read-currently-playing user-read-email user-modify-playback-state user-library-read user-library-modify');
         window.location.href = `https://accounts.spotify.com/authorize?response_type=token&client_id=${clientId}&scope=${scopes}&redirect_uri=${encodedRedirectUri}`;
     }
 
@@ -82,6 +84,14 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   player.addListener('player_state_changed', ({ paused, track_window: { current_track } }) => {
     updateButtonIcon(paused? ['fas', 'fa-play'] : ['fas', 'fa-pause'], 'play-pause-button');
     var currentPlayingUpdated = false;
+    if (currentlyPlaying.spotifyId != current_track['id']) {
+        currentlyPlaying.spotifyId = current_track['id'];
+        currentPlayingUpdated = true;
+    }
+    if (currentlyPlaying.spotifyUri != current_track['uri']) {
+        currentlyPlaying.spotifyUri = current_track['uri'];
+        currentPlayingUpdated = true;
+    }
     if (currentlyPlaying.artist != current_track['artists'][0]['name']) {
         currentlyPlaying.artist = current_track['artists'][0]['name'];
         document.getElementById('artist-name-text').textContent = ` ${currentlyPlaying.artist}`;
@@ -104,6 +114,8 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     }
     if (currentPlayingUpdated) {
         document.getElementById('currently-playing').style.display = 'flex';
+        isSavedToLikedSongs(currentlyPlaying.spotifyId).then(response =>
+            updateButtonIcon(response[0]? ['fa-solid', 'fa-heart'] : ['fa-regular', 'fa-heart'], 'like-button'));
     }
   });
 
@@ -147,6 +159,26 @@ window.onSpotifyWebPlaybackSDKReady = () => {
       player.previousTrack();
   };
   previousButton.disabled = false;
+
+  const likeButton = document.getElementById('like-button');
+  likeButton.disabled = true;
+  likeButton.onclick = function() {
+    updateButtonIcon(['fa-solid', 'fa-spinner', 'fa-spin'], 'like-button');
+    isSavedToLikedSongs(currentlyPlaying.spotifyId).then(response => {
+        const isSavedToLikedSongs = response[0];
+        console.log('Saved to liked songs', response)
+        if (isSavedToLikedSongs) {
+            removeFromLikedSongs(currentlyPlaying.spotifyId).then(() => {
+                updateButtonIcon(['fa-regular', 'fa-heart'], 'like-button');
+            });
+        } else {
+            saveToLikedSongs(currentlyPlaying.spotifyId).then(() => {
+                updateButtonIcon(['fa-solid', 'fa-heart'], 'like-button');
+            });
+        }
+    }).catch(() => updateButtonIcon(['fa-regular', 'fa-heart'], 'like-button'));
+  };
+  likeButton.disabled = false;
 };
 
 const genresContainer = document.querySelector('.pills-container');
@@ -168,6 +200,42 @@ spotifyGenres.forEach(genre => {
         genresContainer.appendChild(label);
     }
 });
+
+function isSavedToLikedSongs(spotifyId) {
+    return fetch(`https://api.spotify.com/v1/me/tracks/contains?ids=${spotifyId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${userAuthData['access_token']}`
+        },
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+        console.log("isSavedToLikedSongs", responseJson);
+        return responseJson;
+    });
+}
+
+function removeFromLikedSongs(spotifyId) {
+    return fetch(`https://api.spotify.com/v1/me/tracks?ids=${spotifyId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${userAuthData['access_token']}`
+        },
+    });
+}
+
+function saveToLikedSongs(spotifyId) {
+    return fetch(`https://api.spotify.com/v1/me/tracks`, {
+        method: 'PUT',
+        body: JSON.stringify({ ids: [spotifyId]}),
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${userAuthData['access_token']}`
+        },
+    });
+}
 
 function transferPlayback(device_id) {
     console.log("Transferring playback to device", device_id);

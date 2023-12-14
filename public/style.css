@@ -42,13 +42,13 @@ button:hover {
     margin-left: 10px;
 }
 
-.music-controls {
+.music-controls, .music-library-controls {
     display: flex;
     justify-content: center;
     margin: 15px 0 0 0;
 }
 
-.music-controls button {
+.music-controls button, .music-library-controls button {
     margin: 0 5px;
 }
 
