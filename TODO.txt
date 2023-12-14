@@ -1,4 +1,5 @@
 - [ ] publish the app!
+- [ ] give info about how many attributes selected at the top of the pills (so user doesn't have to scroll down and count)
 - [ ] add "like" button to add to library
 - [ ] add button to add to a playlist
 - [ ] let user choose one of their playlists as a seed
