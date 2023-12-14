@@ -1,5 +1,6 @@
 - [ ] publish the app!
 - [ ] give info about how many attributes selected at the top of the pills (so user doesn't have to scroll down and count)
+- [ ] use events throughout to handle work e.g. raise event when currently playing has changed, listen to it to update controls
 - [ ] add "like" button to add to library
 - [ ] add button to add to a playlist
 - [ ] let user choose one of their playlists as a seed
