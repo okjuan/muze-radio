@@ -20,6 +20,10 @@ button {
     padding: 1vh;
 }
 
+button:hover {
+    cursor: pointer;
+}
+
 #currently-playing {
     display: flex;
     align-items: center;
