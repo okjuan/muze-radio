@@ -60,6 +60,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   player.addListener('ready', ({ device_id }) => {
     console.log('Ready with Device ID', device_id);
     player.device_id = device_id;
+    transferPlayback(device_id);
   });
 
   player.addListener('not_ready', ({ device_id }) => {
@@ -167,6 +168,18 @@ spotifyGenres.forEach(genre => {
         genresContainer.appendChild(label);
     }
 });
+
+function transferPlayback(device_id) {
+    console.log("Transferring playback to device", device_id);
+    return fetch(`https://api.spotify.com/v1/me/player`, {
+        method: 'PUT',
+        body: JSON.stringify({ device_ids: [device_id], play: true}),
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${userAuthData['access_token']}`
+        },
+    })
+}
 
 function playSongs(device_id, spotify_uris) {
     fetch(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
