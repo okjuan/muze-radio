@@ -84,6 +84,10 @@ button:hover {
     margin: 0 0 10px 0;
 }
 
+.slider:hover {
+    cursor: pointer;
+}
+
 .sliders-container {
     width: auto;
     max-width: 400px;
