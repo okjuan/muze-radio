@@ -132,7 +132,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     console.log('genres', genres);
     getRecommendations(audioFeatures, genres).then(recommendations => {
         console.log('recommendations', recommendations);
-        playSongs(player.device_id, recommendations['tracks'].map(track => track.uri));
+        playSongs(player.device_id, shuffleArray(recommendations['tracks'].map(track => track.uri)));
         updateButtonIcon(['fa-solid', 'fa-magnifying-glass'], 'recommendations-button', ' Search');
     });
     this.disabled = false;
@@ -200,6 +200,14 @@ spotifyGenres.forEach(genre => {
         genresContainer.appendChild(label);
     }
 });
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
 
 function isSavedToLikedSongs(spotifyId) {
     return fetch(`https://api.spotify.com/v1/me/tracks/contains?ids=${spotifyId}`, {
@@ -290,7 +298,7 @@ function getSelectedGenres() {
 }
 
 function getRecommendations(audioFeatures, genres) {
-    var queryParams = `seed_genres=${genres.join(',')}&`;
+    var queryParams = `seed_genres=${genres.join(',')}&limit=100&`
     queryParams += Object.entries(audioFeatures)
         .map(([key, value]) => `target_${key}=${value}`)
         .join('&');
