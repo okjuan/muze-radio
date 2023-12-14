@@ -53,7 +53,7 @@ if (shouldFetchNewToken()) {
 
 window.onSpotifyWebPlaybackSDKReady = () => {
     const player = new Spotify.Player({
-      name: 'Web Playback SDK Quick Start Player',
+      name: 'Muze Radio',
       getOAuthToken: cb => { cb(userAuthData['access_token']); }
     });
 
