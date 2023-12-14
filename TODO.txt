@@ -4,7 +4,6 @@
 - [ ] let user choose one of their playlists as a seed
 - [ ] show list of songs in queue
 - [ ] add ban button ("don't play this song again")
-- [ ] avoid button width change when toggling from Play and Pause
 - [ ] add song progress bar that user can drag to skip
 - [ ] disable recommendations button until user makes a change to config (keep track of config state)
 - [ ] set recommendations to Loading disabled state until music plays

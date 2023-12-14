@@ -183,10 +183,10 @@ function updatePlayPauseButton(newState) {
     var playPauseButton = document.getElementById('play-pause-button');
     if (newState === 'Playing') {
         playPauseButton.textContent = 'Pause';
-        playPauseButton.innerHTML = '<i class="fas fa-pause"></i> Pause';
+        playPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
     } else if (newState === 'Paused') {
         playPauseButton.textContent = 'Play';
-        playPauseButton.innerHTML = '<i class="fas fa-play"></i> Play';
+        playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
     } else if (newState === 'Loading') {
         playPauseButton.textContent = 'Loading';
     } else {
