@@ -1,3 +1,8 @@
+:root {
+    --currently-playing-right-block-width: 20vh;
+    --currently-playing-right-block-height: 20vh;
+}
+
 body {
     background-color: lightblue;
     font-family: 'Inconsolata', 'Arial', sans-serif;
@@ -20,6 +25,29 @@ button {
     align-items: center;
 }
 
+#currently-playing > div {
+    flex: 1;
+}
+
+#song-info p {
+    display: flex;
+    justify-content: center;
+}
+
+#song-name-text, #artist-name-text, #album-name-text {
+    margin-left: 10px;
+}
+
+.music-controls {
+    display: flex;
+    justify-content: center;
+    margin: 15px 0 0 0;
+}
+
+.music-controls button {
+    margin: 0 5px;
+}
+
 #recommendations-button-container {
     padding: 3vh 0vw;
 }
@@ -31,13 +59,21 @@ button {
 }
 
 #cover-art {
-    width: 20vh;
-    height: 20vh;
+    /* margin: 5vw; */
+    width: var(--currently-playing-right-block-width);
+    height: var(--currently-playing-right-block-height);
 }
 
-#song-info {
-    margin-left: 2vw;
-    width: auto;
+#currently-playing-right {
+    width: var(--currently-playing-right-block-width);
+    height: var(--currently-playing-right-block-height);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#currently-playing-right p {
+    margin: 0 0 10px 0;
 }
 
 .sliders-container {
@@ -100,7 +136,3 @@ button {
     max-width: 50%;
     padding: 0px 5vw;
 }
-
-/* #song-name, #artist-name {
-    text-align: center;
-} */

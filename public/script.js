@@ -102,7 +102,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
         currentPlayingUpdated = true;
     }
     if (currentPlayingUpdated) {
-        document.getElementById('currently-playing').style.display = '';
+        document.getElementById('currently-playing').style.display = 'flex';
     }
   });
 
