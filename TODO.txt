@@ -1,4 +1,5 @@
 - [ ] publish the app!
+- [ ] use Spotify's Get User's Top Items API to personalize recommendations
 - [ ] give info about how many attributes selected at the top of the pills (so user doesn't have to scroll down and count)
 - [ ] use events throughout to handle work e.g. raise event when currently playing has changed, listen to it to update controls
 - [ ] specify values for Spotify's other audio feature values
