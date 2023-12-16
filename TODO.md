@@ -1,8 +1,11 @@
 - [ ] publish the app!
 - add to playlist:
+    - [ ] **important** don't show playlist if not owned by user
     - [ ] tell user when song has been added to playlist
     - [ ] figure out a way to order the playlists (alphabetical? last played?)
-    - [ ] **interesting**: consider having playlist modal open all the time
+    - [ ] schedule a background task to fetch user playlists so it is fetched ASAP but without affect other perf
+        - [ ] if, even pre-fetching user playlists, it still takes a long time to fetch user playlists when user clicks on plus button
+    - [ ] **interesting**: consider having playlist modal open all the time as a side-view
 - [ ] use Spotify's Get User's Top Items API to personalize recommendations
 - [ ] give info about how many attributes selected at the top of the pills (so user doesn't have to scroll down and count)
 - [ ] fix placement of playlist list modal in mobile
