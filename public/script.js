@@ -13,6 +13,7 @@ const clientId = 'TODO';
 const clientSecret = 'TODO';
 const redirectUri = 'http://localhost:5000';
 const spotifyMaxPlaylistsPerRequest = 50;
+const spotifyMaxSongsPerAddToPlaylistRequest = 100;
 const spotifySeedGenres = ["acoustic", "afrobeat", "alt-rock", "alternative", "ambient", "anime", "black-metal", "bluegrass", "blues", "bossanova", "brazil", "breakbeat", "british", "cantopop", "chicago-house", "children", "chill", "classical", "club", "comedy", "country", "dance", "dancehall", "death-metal", "deep-house", "detroit-techno", "disco", "disney", "drum-and-bass", "dub", "dubstep", "edm", "electro", "electronic", "emo", "folk", "forro", "french", "funk", "garage", "german", "gospel", "goth", "grindcore", "groove", "grunge", "guitar", "happy", "hard-rock", "hardcore", "hardstyle", "heavy-metal", "hip-hop", "holidays", "honky-tonk", "house", "idm", "indian", "indie", "indie-pop", "industrial", "iranian", "j-dance", "j-idol", "j-pop", "j-rock", "jazz", "k-pop", "kids", "latin", "latino", "malay", "mandopop", "metal", "metal-misc", "metalcore", "minimal-techno", "movies", "mpb", "new-age", "new-release", "opera", "pagode", "party", "philippines-opm", "piano", "pop", "pop-film", "post-dubstep", "power-pop", "progressive-house", "psych-rock", "punk", "punk-rock", "r-n-b", "rainy-day", "reggae", "reggaeton", "road-trip", "rock", "rock-n-roll", "rockabilly", "romance", "sad", "salsa", "samba", "sertanejo", "show-tunes", "singer-songwriter", "ska", "sleep", "songwriter", "soul", "soundtracks", "spanish", "study", "summer", "swedish", "synth-pop", "tango", "techno", "trance", "trip-hop", "turkish", "work-out", "world-music"];
 const maxSeedGenres = 5;
 const spotifyScopes = ['streaming user-read-private user-read-playback-state user-read-currently-playing user-read-email user-modify-playback-state user-library-read user-library-modify', 'playlist-read-collaborative', 'playlist-read-private', 'playlist-modify-private', 'playlist-modify-public'];
@@ -255,14 +256,30 @@ function showPlaylistPicker(playlists) {
 }
 
 function addSongsToPlaylist(playlistId, songUris, position=undefined) {
-    const queryParams = `uris=${songUris.join(',')}` + (position !== undefined? `&position=${position}` : '');
-    return fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?${queryParams}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${userAuthData['access_token']}`
-        },
-    }).then(response => response.json());
+    const songUriBatches = chunkArray(songUris, spotifyMaxSongsPerAddToPlaylistRequest);
+    var songsAdded = 0;
+    var requests = [];
+    for (const songUriBatch of songUriBatches) {
+        const queryParams = `uris=${songUriBatch.join(',')}` + (position !== undefined? `&position=${position + songsAdded}` : '');
+        const request = fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?${queryParams}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userAuthData['access_token']}`
+            },
+        }).then(response => response.json());
+        requests.push(request);
+        songsAdded += songUriBatch.length;
+    }
+    return Promise.all(requests);
+}
+
+function chunkArray(array, chunkSize) {
+    let chunks = [];
+    for (let i = 0; i < array.length; i += chunkSize) {
+        chunks.push(array.slice(i, i + chunkSize));
+    }
+    return chunks;
 }
 
 const genresContainer = document.querySelector('.pills-container');
