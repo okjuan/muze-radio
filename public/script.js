@@ -191,24 +191,14 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   const plusButton = document.getElementById('add-button');
   plusButton.disabled = true;
   plusButton.onclick = function() {
-        if (userPlaylists) {
-            // If playlists are already cached, the playlist picker renders quickly
-            // so there is no need for the spinner. Moreover, adding the spinner
-            // causes a pesky bug where clicking in the middle of the button, where
-            // the icon is, makes the icon the target of the click event, which
-            // is a problem because it is removed from the DOM and therefore considered
-            // NOT a child of the button, so the click event is treated as outside the button.
-            console.log('Using cached playlists');
-            showPlaylistPicker(userPlaylists);
-        } else {
-            document.getElementById('add-button').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`
-            getUserPlaylists().then(playlists => {
-                document.getElementById('add-button').innerHTML = `<i class="fa-solid fa-plus"></i>`
-                showPlaylistPicker(playlists);
-            }).catch(() => {
-                document.getElementById('add-button').innerHTML = `<i class="fa-solid fa-plus"></i>`
-            });
-        }
+        const addIcon = document.getElementById('add-button-icon');
+        addIcon.className = "fa-solid fa-spinner fa-spin";
+        getUserPlaylists().then(playlists => {
+            addIcon.className = "fa-solid fa-plus";
+            showPlaylistPicker(playlists);
+        }).catch(() => {
+            addIcon.className = "fa-solid fa-plus";
+        });
     };
   plusButton.disabled = false;
 };
@@ -241,6 +231,10 @@ function isSubsetOf(arr1, arr2) {
 }
 
 function getUserPlaylists() {
+    if (userPlaylists) {
+        console.log('Using cached playlists');
+        return Promise.resolve(userPlaylists);
+    }
     return getUserPlaylistsRecursively(0, spotifyMaxPlaylistsPerRequest);
 }
 
