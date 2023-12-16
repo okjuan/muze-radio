@@ -17,6 +17,7 @@ const spotifyMaxSongsPerAddToPlaylistRequest = 100;
 const spotifySeedGenres = ["acoustic", "afrobeat", "alt-rock", "alternative", "ambient", "anime", "black-metal", "bluegrass", "blues", "bossanova", "brazil", "breakbeat", "british", "cantopop", "chicago-house", "children", "chill", "classical", "club", "comedy", "country", "dance", "dancehall", "death-metal", "deep-house", "detroit-techno", "disco", "disney", "drum-and-bass", "dub", "dubstep", "edm", "electro", "electronic", "emo", "folk", "forro", "french", "funk", "garage", "german", "gospel", "goth", "grindcore", "groove", "grunge", "guitar", "happy", "hard-rock", "hardcore", "hardstyle", "heavy-metal", "hip-hop", "holidays", "honky-tonk", "house", "idm", "indian", "indie", "indie-pop", "industrial", "iranian", "j-dance", "j-idol", "j-pop", "j-rock", "jazz", "k-pop", "kids", "latin", "latino", "malay", "mandopop", "metal", "metal-misc", "metalcore", "minimal-techno", "movies", "mpb", "new-age", "new-release", "opera", "pagode", "party", "philippines-opm", "piano", "pop", "pop-film", "post-dubstep", "power-pop", "progressive-house", "psych-rock", "punk", "punk-rock", "r-n-b", "rainy-day", "reggae", "reggaeton", "road-trip", "rock", "rock-n-roll", "rockabilly", "romance", "sad", "salsa", "samba", "sertanejo", "show-tunes", "singer-songwriter", "ska", "sleep", "songwriter", "soul", "soundtracks", "spanish", "study", "summer", "swedish", "synth-pop", "tango", "techno", "trance", "trip-hop", "turkish", "work-out", "world-music"];
 const maxSeedGenres = 5;
 const spotifyScopes = ['streaming user-read-private user-read-playback-state user-read-currently-playing user-read-email user-modify-playback-state user-library-read user-library-modify', 'playlist-read-collaborative', 'playlist-read-private', 'playlist-modify-private', 'playlist-modify-public'];
+var playlistPickerShowing = false;
 
 const shouldFetchNewToken = (scopes) => {
     if (!userAuthData) {
@@ -190,13 +191,24 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   const plusButton = document.getElementById('add-button');
   plusButton.disabled = true;
   plusButton.onclick = function() {
-        document.getElementById('add-button').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`
-        getUserPlaylists().then(playlists => {
-            document.getElementById('add-button').innerHTML = `<i class="fa-solid fa-plus"></i>`
-            showPlaylistPicker(playlists);
-        }).catch(() => {
-            document.getElementById('add-button').innerHTML = `<i class="fa-solid fa-plus"></i>`
-        });
+        if (userPlaylists) {
+            // If playlists are already cached, the playlist picker renders quickly
+            // so there is no need for the spinner. Moreover, adding the spinner
+            // causes a pesky bug where clicking in the middle of the button, where
+            // the icon is, makes the icon the target of the click event, which
+            // is a problem because it is removed from the DOM and therefore considered
+            // NOT a child of the button, so the click event is treated as outside the button.
+            console.log('Using cached playlists');
+            showPlaylistPicker(userPlaylists);
+        } else {
+            document.getElementById('add-button').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`
+            getUserPlaylists().then(playlists => {
+                document.getElementById('add-button').innerHTML = `<i class="fa-solid fa-plus"></i>`
+                showPlaylistPicker(playlists);
+            }).catch(() => {
+                document.getElementById('add-button').innerHTML = `<i class="fa-solid fa-plus"></i>`
+            });
+        }
     };
   plusButton.disabled = false;
 };
@@ -205,6 +217,22 @@ document.addEventListener('keyup', function onDocumentKeyUp(event) {
     const playlistListModal = document.getElementById('playlist-list-container');
     if (playlistListModal && event.key === 'Escape') {
         playlistListModal.style.display = 'none';
+        playlistPickerShowing = false;
+    }
+});
+
+document.addEventListener('click', function(event) {
+    if (!playlistPickerShowing) {
+        return;
+    }
+    const playlistListModal = document.getElementById('playlist-list-container');
+    const playlistList = document.getElementById('playlist-list');
+    const addButton = document.getElementById('add-button');
+    const playlistListClicked = playlistList.contains(event.target) || playlistList === event.target;
+    const addButtonClicked = addButton.contains(event.target) || addButton === event.target;
+    if (playlistListModal && !playlistListClicked && !addButtonClicked) {
+        playlistListModal.style.display = 'none';
+        playlistPickerShowing = false;
     }
 });
 
@@ -213,10 +241,6 @@ function isSubsetOf(arr1, arr2) {
 }
 
 function getUserPlaylists() {
-    if (userPlaylists) {
-        console.log('Using cached playlists');
-        return Promise.resolve(userPlaylists);
-    }
     return getUserPlaylistsRecursively(0, spotifyMaxPlaylistsPerRequest);
 }
 
@@ -270,6 +294,7 @@ function showPlaylistPicker(playlists) {
     playlistListElement.append(...newPlaylists);
     const playlistListModal = document.getElementById('playlist-list-container');
     playlistListModal.style.display = 'block';
+    playlistPickerShowing = true;
 }
 
 function addSongsToPlaylist(playlistId, songUris, position=undefined) {
