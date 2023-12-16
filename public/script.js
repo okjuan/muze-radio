@@ -87,7 +87,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   });
 
   player.addListener('player_state_changed', ({ paused, track_window: { current_track } }) => {
-    updateButtonIcon(paused? ['fas', 'fa-play'] : ['fas', 'fa-pause'], 'play-pause-button');
+    document.getElementById('play-pause-button').innerHTML = `<i class="fas ${paused? 'fa-play' : 'fa-pause'}"></i>`;
     var currentPlayingUpdated = false;
     if (currentlyPlaying.spotifyId != current_track['id']) {
         currentlyPlaying.spotifyId = current_track['id'];
@@ -119,8 +119,9 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     }
     if (currentPlayingUpdated) {
         document.getElementById('currently-playing').style.display = 'flex';
-        isSavedToLikedSongs(currentlyPlaying.spotifyId).then(response =>
-            updateButtonIcon(response[0]? ['fa-solid', 'fa-heart'] : ['fa-regular', 'fa-heart'], 'like-button'));
+        isSavedToLikedSongs(currentlyPlaying.spotifyId).then(response => {
+            document.getElementById('like-button').innerHTML = `<i class="${response[0]? 'fa-solid fa-heart' : 'fa-regular fa-heart'}"></i>`
+        });
     }
   });
 
@@ -129,7 +130,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   const generateRecommendationsButton = document.getElementById('recommendations-button');
   generateRecommendationsButton.disabled = true;
   generateRecommendationsButton.onclick = function() {
-    updateButtonIcon(['fa-solid', 'fa-spinner', 'fa-spin'], 'recommendations-button');
+    document.getElementById('recommendations-button').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`
     this.disabled = true;
     const audioFeatures = getSpotifyAudioFeatures();
     console.log('audioFeatures', audioFeatures);
@@ -138,7 +139,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     getRecommendations(audioFeatures, genres).then(recommendations => {
         console.log('recommendations', recommendations);
         playSongs(player.device_id, shuffleArray(recommendations['tracks'].map(track => track.uri)));
-        updateButtonIcon(['fa-solid', 'fa-magnifying-glass'], 'recommendations-button', ' Search');
+        document.getElementById('recommendations-button').innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> Search`;
     });
     this.disabled = false;
   };
@@ -168,30 +169,34 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   const likeButton = document.getElementById('like-button');
   likeButton.disabled = true;
   likeButton.onclick = function() {
-    updateButtonIcon(['fa-solid', 'fa-spinner', 'fa-spin'], 'like-button');
+    document.getElementById('like-button').innerHTML = `<i class="fa-spinner fa-spin"></i>`;
     isSavedToLikedSongs(currentlyPlaying.spotifyId).then(response => {
         const isSavedToLikedSongs = response[0];
         if (isSavedToLikedSongs) {
             removeFromLikedSongs(currentlyPlaying.spotifyId).then(() => {
-                updateButtonIcon(['fa-regular', 'fa-heart'], 'like-button');
+                document.getElementById('like-button').innerHTML = `<i class="fa-regular fa-heart"></i>`;
             });
         } else {
             saveToLikedSongs(currentlyPlaying.spotifyId).then(() => {
-                updateButtonIcon(['fa-solid', 'fa-heart'], 'like-button');
+                document.getElementById('like-button').innerHTML = `<i class="fa-solid fa-heart"></i>`;
             });
         }
-    }).catch(() => updateButtonIcon(['fa-regular', 'fa-heart'], 'like-button'));
+    }).catch(() => {
+        document.getElementById('like-button').innerHTML = `<i class="fa-regular fa-heart"></i>`
+    });
   };
   likeButton.disabled = false;
 
   const plusButton = document.getElementById('add-button');
   plusButton.disabled = true;
   plusButton.onclick = function() {
-        updateButtonIcon(['fa-solid', 'fa-spinner', 'fa-spin'], 'add-button');
+        document.getElementById('add-button').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`
         getUserPlaylists().then(playlists => {
-            updateButtonIcon(['fa-solid', 'fa-plus'], 'add-button');
+            document.getElementById('add-button').innerHTML = `<i class="fa-solid fa-plus"></i>`
             showPlaylistPicker(playlists);
-        }).catch(() => updateButtonIcon(['fa-solid', 'fa-plus'], 'add-button'));
+        }).catch(() => {
+            document.getElementById('add-button').innerHTML = `<i class="fa-solid fa-plus"></i>`
+        });
     };
   plusButton.disabled = false;
 };
@@ -244,7 +249,19 @@ function showPlaylistPicker(playlists) {
         .filter(playlist => !existingPlaylistIds.includes(playlist['id']))
         .map(playlist => {
             const playlistListItem = document.createElement('p');
-            playlistListItem.onclick = () => addSongsToPlaylist(playlist['id'], [currentlyPlaying.spotifyUri], 0);
+            let isClickEnabled = true;
+            playlistListItem.onclick = (event) => {
+                if (!isClickEnabled) {
+                    return;
+                }
+                isClickEnabled = false;
+                event.target.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`
+                addSongsToPlaylist(playlist['id'], [currentlyPlaying.spotifyUri], 0)
+                .then(() => {
+                    event.target.innerHTML = playlist.name;
+                    isClickEnabled = true;
+                });
+            };
             playlistListItem.className = 'playlist-list-item';
             playlistListItem.textContent = playlist.name;
             playlistListItem.dataset.playlistId = playlist['id'];
@@ -367,11 +384,6 @@ function playSongs(device_id, spotify_uris) {
         },
     });
 }
-
-function updateButtonIcon(buttonClasses, buttonId, text="") {
-    var playPauseButton = document.getElementById(buttonId);
-    playPauseButton.innerHTML = `<i class="${buttonClasses.join(' ')}"></i>` + text;
-};
 
 function getSpotifyAudioFeatures() {
     var sliders = document.getElementsByClassName('slider');

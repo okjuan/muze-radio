@@ -1,6 +1,5 @@
 - [ ] publish the app!
 - add to playlist:
-    - [ ] disabled clicking and set playlist item to Loading state until added to playlist
     - [ ] tell user when song has been added to playlist
     - [ ] figure out a way to order the playlists (alphabetical? last played?)
     - [ ] close playlist modal when user clicks outside it
