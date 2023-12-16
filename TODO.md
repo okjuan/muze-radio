@@ -1,6 +1,5 @@
 - [ ] publish the app!
 - add to playlist:
-    - [ ] **IMPORTANT**: skip adding playlists that are already in the list
     - [ ] **IMPORTANT**: enforce Spotify's max 100 song limit
     - [ ] disabled clicking and set playlist item to Loading state until added to playlist
     - [ ] tell user when song has been added to playlist

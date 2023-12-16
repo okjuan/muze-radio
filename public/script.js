@@ -228,13 +228,21 @@ function getUserPlaylists() {
 
 function showPlaylistPicker(playlists) {
     const playlistListElement = document.getElementById('playlist-list');
-    playlists.forEach(playlist => {
-        const listItem = document.createElement('p');
-        listItem.onclick = () => addSongsToPlaylist(playlist['id'], [currentlyPlaying.spotifyUri], 0);
-        listItem.className = 'playlist-list-item';
-        listItem.textContent = playlist.name;
-        playlistListElement.appendChild(listItem);
-    });
+    const existingPlaylists = Array.from(
+        playlistListElement.querySelectorAll('.playlist-list-item'));
+    const existingPlaylistIds = existingPlaylists
+        .map(playlistElement => playlistElement.dataset.playlistId);
+    const newPlaylists = playlists
+        .filter(playlist => !existingPlaylistIds.includes(playlist['id']))
+        .map(playlist => {
+            const playlistListItem = document.createElement('p');
+            playlistListItem.onclick = () => addSongsToPlaylist(playlist['id'], [currentlyPlaying.spotifyUri], 0);
+            playlistListItem.className = 'playlist-list-item';
+            playlistListItem.textContent = playlist.name;
+            playlistListItem.dataset.playlistId = playlist['id'];
+            return playlistListItem;
+        });
+    playlistListElement.append(...newPlaylists);
     const playlistListModal = document.getElementById('playlist-list-container');
     playlistListModal.style.display = 'block';
 }
