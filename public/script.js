@@ -49,8 +49,6 @@ if (shouldFetchNewToken()) {
     const now = new Date();
     userAuthData['expiresAt'] = new Date(now.getTime() + (userAuthData['expiresIn'] - expiryBufferInSeconds) * 1000);
     console.log('userAuthData', userAuthData);
-} else {
-    console.log("Didn't fetch new token");
 }
 
 window.onSpotifyWebPlaybackSDKReady = () => {
@@ -166,7 +164,6 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     updateButtonIcon(['fa-solid', 'fa-spinner', 'fa-spin'], 'like-button');
     isSavedToLikedSongs(currentlyPlaying.spotifyId).then(response => {
         const isSavedToLikedSongs = response[0];
-        console.log('Saved to liked songs', response)
         if (isSavedToLikedSongs) {
             removeFromLikedSongs(currentlyPlaying.spotifyId).then(() => {
                 updateButtonIcon(['fa-regular', 'fa-heart'], 'like-button');
@@ -246,7 +243,6 @@ function saveToLikedSongs(spotifyId) {
 }
 
 function transferPlayback(device_id) {
-    console.log("Transferring playback to device", device_id);
     return fetch(`https://api.spotify.com/v1/me/player`, {
         method: 'PUT',
         body: JSON.stringify({ device_ids: [device_id], play: true}),
