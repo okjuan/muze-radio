@@ -7,6 +7,7 @@ var currentlyPlaying = {
     spotifyUri: undefined,
     spotifyId: undefined,
 };
+var userPlaylists = undefined;
 const expiryBufferInSeconds = 60 * 5;
 const clientId = 'TODO';
 const clientSecret = 'TODO';
@@ -176,7 +177,76 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     }).catch(() => updateButtonIcon(['fa-regular', 'fa-heart'], 'like-button'));
   };
   likeButton.disabled = false;
+
+  const plusButton = document.getElementById('add-button');
+  plusButton.disabled = true;
+  plusButton.onclick = function() {
+        updateButtonIcon(['fa-solid', 'fa-spinner', 'fa-spin'], 'add-button');
+        getUserPlaylists().then(playlists => {
+            updateButtonIcon(['fa-solid', 'fa-plus'], 'add-button');
+            showPlaylistPicker(playlists);
+        }).catch(() => updateButtonIcon(['fa-solid', 'fa-plus'], 'add-button'));
+    };
+  plusButton.disabled = false;
 };
+
+document.addEventListener('keyup', function onDocumentKeyUp(event) {
+    const playlistListModal = document.getElementById('playlist-list-container');
+    if (playlistListModal && event.key === 'Escape') {
+        playlistListModal.style.display = 'none';
+    }
+});
+
+function isSubsetOf(arr1, arr2) {
+    return arr2.every(arr2Item => arr1.includes(arr2Item));
+}
+
+function getUserPlaylists() {
+    if (userPlaylists) {
+        console.log('Using cached playlists');
+        return Promise.resolve(userPlaylists);
+    }
+    const maxPlaylistsPerRequest = 50;
+    return fetch(`https://api.spotify.com/v1/me/playlists?limit=${maxPlaylistsPerRequest}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${userAuthData['access_token']}`
+        },
+    })
+    .then((response) => response.json())
+    .then((response) => {
+        userPlaylists = response['items']
+        console.log('playlists', userPlaylists);
+        return userPlaylists;
+    });
+}
+
+function showPlaylistPicker(playlists) {
+    const playlistListElement = document.getElementById('playlist-list');
+    // TODO skip adding playlists that are already in the list
+    playlists.forEach(playlist => {
+        const listItem = document.createElement('p');
+        listItem.onclick = () => addSongsToPlaylist(playlist['id'], [currentlyPlaying.spotifyUri], 0);
+        listItem.className = 'playlist-list-item';
+        listItem.textContent = playlist.name;
+        playlistListElement.appendChild(listItem);
+    });
+    const playlistListModal = document.getElementById('playlist-list-container');
+    playlistListModal.style.display = 'block';
+}
+
+function addSongsToPlaylist(playlistId, songUris, position=undefined) {
+    // TODO: enforce Spotify's max 100 song limit
+    const queryParams = `uris=${songUris.join(',')}` + (position !== undefined? `&position=${position}` : '');
+    return fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?${queryParams}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${userAuthData['access_token']}`
+        },
+    }).then(response => response.json());
+}
 
 const genresContainer = document.querySelector('.pills-container');
 spotifySeedGenres.forEach(genre => {
