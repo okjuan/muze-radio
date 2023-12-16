@@ -14,10 +14,14 @@ const clientSecret = 'TODO';
 const redirectUri = 'http://localhost:5000';
 const spotifySeedGenres = ["acoustic", "afrobeat", "alt-rock", "alternative", "ambient", "anime", "black-metal", "bluegrass", "blues", "bossanova", "brazil", "breakbeat", "british", "cantopop", "chicago-house", "children", "chill", "classical", "club", "comedy", "country", "dance", "dancehall", "death-metal", "deep-house", "detroit-techno", "disco", "disney", "drum-and-bass", "dub", "dubstep", "edm", "electro", "electronic", "emo", "folk", "forro", "french", "funk", "garage", "german", "gospel", "goth", "grindcore", "groove", "grunge", "guitar", "happy", "hard-rock", "hardcore", "hardstyle", "heavy-metal", "hip-hop", "holidays", "honky-tonk", "house", "idm", "indian", "indie", "indie-pop", "industrial", "iranian", "j-dance", "j-idol", "j-pop", "j-rock", "jazz", "k-pop", "kids", "latin", "latino", "malay", "mandopop", "metal", "metal-misc", "metalcore", "minimal-techno", "movies", "mpb", "new-age", "new-release", "opera", "pagode", "party", "philippines-opm", "piano", "pop", "pop-film", "post-dubstep", "power-pop", "progressive-house", "psych-rock", "punk", "punk-rock", "r-n-b", "rainy-day", "reggae", "reggaeton", "road-trip", "rock", "rock-n-roll", "rockabilly", "romance", "sad", "salsa", "samba", "sertanejo", "show-tunes", "singer-songwriter", "ska", "sleep", "songwriter", "soul", "soundtracks", "spanish", "study", "summer", "swedish", "synth-pop", "tango", "techno", "trance", "trip-hop", "turkish", "work-out", "world-music"];
 const maxSeedGenres = 5;
+const spotifyScopes = ['streaming user-read-private user-read-playback-state user-read-currently-playing user-read-email user-modify-playback-state user-library-read user-library-modify', 'playlist-read-collaborative', 'playlist-read-private', 'playlist-modify-private', 'playlist-modify-public'];
 
-const shouldFetchNewToken = () => {
+const shouldFetchNewToken = (scopes) => {
     if (!userAuthData) {
         console.log('No token found');
+        return true;
+    } else if (!isSubsetOf(userAuthData['scopes'], scopes)) {
+        console.log('New scopes requested');
         return true;
     }
     const now = new Date();
@@ -29,11 +33,10 @@ const shouldFetchNewToken = () => {
     return false;
 }
 
-if (shouldFetchNewToken()) {
+if (shouldFetchNewToken(spotifyScopes)) {
     if (!window.location.hash) {
         const encodedRedirectUri = encodeURIComponent(redirectUri);
-        const scopes = encodeURIComponent('streaming user-read-private user-read-playback-state user-read-currently-playing user-read-email user-modify-playback-state user-library-read user-library-modify');
-        window.location.href = `https://accounts.spotify.com/authorize?response_type=token&client_id=${clientId}&scope=${scopes}&redirect_uri=${encodedRedirectUri}`;
+        window.location.href = `https://accounts.spotify.com/authorize?response_type=token&client_id=${clientId}&scope=${encodeURIComponent(spotifyScopes)}&redirect_uri=${encodedRedirectUri}`;
     }
 
     userAuthData = window.location.hash
@@ -49,6 +52,7 @@ if (shouldFetchNewToken()) {
     window.history.replaceState(null, null, ' ');
     const now = new Date();
     userAuthData['expiresAt'] = new Date(now.getTime() + (userAuthData['expiresIn'] - expiryBufferInSeconds) * 1000);
+    userAuthData['scopes'] = spotifyScopes;
     console.log('userAuthData', userAuthData);
 }
 
