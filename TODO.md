@@ -3,7 +3,6 @@
     - [ ] **IMPORTANT**: enforce Spotify's max 100 song limit
     - [ ] disabled clicking and set playlist item to Loading state until added to playlist
     - [ ] tell user when song has been added to playlist
-    - [ ] support case when more than 50 playlists exist in a user's profile
     - [ ] figure out a way to order the playlists (alphabetical? last played?)
     - [ ] close playlist modal when user clicks outside it
         ```js
