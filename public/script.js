@@ -228,7 +228,6 @@ function getUserPlaylists() {
 
 function showPlaylistPicker(playlists) {
     const playlistListElement = document.getElementById('playlist-list');
-    // TODO skip adding playlists that are already in the list
     playlists.forEach(playlist => {
         const listItem = document.createElement('p');
         listItem.onclick = () => addSongsToPlaylist(playlist['id'], [currentlyPlaying.spotifyUri], 0);
@@ -241,7 +240,6 @@ function showPlaylistPicker(playlists) {
 }
 
 function addSongsToPlaylist(playlistId, songUris, position=undefined) {
-    // TODO: enforce Spotify's max 100 song limit
     const queryParams = `uris=${songUris.join(',')}` + (position !== undefined? `&position=${position}` : '');
     return fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?${queryParams}`, {
         method: 'POST',
