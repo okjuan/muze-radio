@@ -150,7 +150,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   const likeButton = document.getElementById('like-button');
   likeButton.disabled = true;
   likeButton.onclick = function() {
-    document.getElementById('like-button').innerHTML = `<i class="fa-spinner fa-spin"></i>`;
+    document.getElementById('like-button').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
     isSavedToLikedSongs(currentlyPlaying.spotifyId).then(response => {
         const isSavedToLikedSongs = response[0];
         if (isSavedToLikedSongs) {
