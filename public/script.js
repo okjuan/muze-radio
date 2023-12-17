@@ -280,8 +280,11 @@ function showPlaylistPicker(playlists) {
                 event.target.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`
                 addSongsToPlaylist(playlist['id'], [currentlyPlaying.spotifyUri], 0)
                 .then(() => {
-                    event.target.innerHTML = playlist.name;
-                    isClickEnabled = true;
+                    event.target.querySelector('i').className = 'fa-solid fa-check';
+                    setTimeout(() => {
+                        event.target.innerHTML = playlist.name;
+                        isClickEnabled = true;
+                    }, 1000);
                 });
             };
             playlistListItem.className = 'playlist-list-item';
