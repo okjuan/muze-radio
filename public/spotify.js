@@ -9,7 +9,7 @@ export const maxSeedGenres = 5;
 var userPlaylists = undefined;
 var userId = undefined;
 const userAuthDataKey = "userAuthData";
-const expiryBufferInSeconds = 60 * 5;
+const expiryBufferInSeconds = 5;
 const redirectUri = 'http://localhost:5000';
 
 export function getUserAuth(spotifyScopes) {
