@@ -269,6 +269,7 @@ function showPlaylistPicker(playlists) {
         .map(playlistElement => playlistElement.dataset.playlistId);
     const newPlaylists = playlists
         .filter(playlist => !existingPlaylistIds.includes(playlist['id']))
+        .sort((playlist1, playlist2) => playlist1.name.localeCompare(playlist2.name))
         .map(playlist => {
             const playlistListItem = document.createElement('p');
             let isClickEnabled = true;
