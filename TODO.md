@@ -1,7 +1,6 @@
 - [ ] publish the app!
 - [ ] fix layout which got messed up by my adding heart and plus buttons, which leak out of `currently-playing-right` div
 - add to playlist:
-    - [ ] **important** don't show playlist if not owned by user
     - [ ] tell user when song has been added to playlist
     - [ ] figure out a way to order the playlists (alphabetical? last played?)
     - [ ] schedule a background task to fetch user playlists so it is fetched ASAP but without affect other perf

@@ -235,7 +235,12 @@ function getUserPlaylists() {
         console.log('Using cached playlists');
         return Promise.resolve(userPlaylists);
     }
-    return getUserPlaylistsRecursively(0, spotifyMaxPlaylistsPerRequest);
+    return (userAuthData.getUserId()).then(userId => {
+        const editableByUser = (playlist) =>
+            userId === playlist.owner.id || playlist.collaborative;
+        return getUserPlaylistsRecursively(0, spotifyMaxPlaylistsPerRequest)
+            .then((playlists) => playlists.filter(editableByUser));
+    });
 }
 
 function getUserPlaylistsRecursively(offset, limit) {
@@ -463,5 +468,16 @@ function getSpotifyWebAPIBearerToken() {
         body: body
     })
     .then(response => response.json())
+    .catch(error => console.error('Error:', error));
+}
+
+function getCurrentUserId() {
+    return fetch('https://api.spotify.com/v1/me', {
+        headers: {
+            'Authorization': 'Bearer ' + userAuthData['access_token']
+        }
+    })
+    .then(response => response.json())
+    .then(data => data.id)
     .catch(error => console.error('Error:', error));
 }
