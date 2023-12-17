@@ -232,7 +232,6 @@ function isSubsetOf(arr1, arr2) {
 
 function getUserPlaylists() {
     if (userPlaylists) {
-        console.log('Using cached playlists');
         return Promise.resolve(userPlaylists);
     }
     return (userAuthData.getUserId()).then(userId => {
@@ -361,7 +360,6 @@ function isSavedToLikedSongs(spotifyId) {
     })
     .then((response) => response.json())
     .then((responseJson) => {
-        console.log("isSavedToLikedSongs", responseJson);
         return responseJson;
     });
 }
