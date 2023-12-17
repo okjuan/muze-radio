@@ -68,7 +68,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   });
 
   player.addListener('player_state_changed', ({ paused, track_window: { current_track } }) => {
-    document.getElementById('play-pause-button').innerHTML = `<i class="fas ${paused? 'fa-play' : 'fa-pause'}"></i>`;
+    document.getElementById('play-pause-button-icon').className = `fas ${paused? 'fa-play' : 'fa-pause'}`;
     var currentPlayingUpdated = false;
     if (currentlyPlaying.spotifyId != current_track['id']) {
         currentlyPlaying.spotifyId = current_track['id'];
@@ -101,7 +101,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     if (currentPlayingUpdated) {
         document.getElementById('currently-playing').style.display = 'flex';
         isSavedToLikedSongs(currentlyPlaying.spotifyId).then(response => {
-            document.getElementById('like-button').innerHTML = `<i class="${response[0]? 'fa-solid fa-heart' : 'fa-regular fa-heart'}"></i>`
+            document.getElementById('like-button-icon').className = `${response[0]? 'fa-solid fa-heart' : 'fa-regular fa-heart'}`
         });
     }
   });
@@ -111,7 +111,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   const generateRecommendationsButton = document.getElementById('recommendations-button');
   generateRecommendationsButton.disabled = true;
   generateRecommendationsButton.onclick = function() {
-    document.getElementById('recommendations-button').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`
+    document.getElementById('recommendations-button-icon').className = "fa-solid fa-spinner fa-spin";
     this.disabled = true;
     const audioFeatures = getSpotifyAudioFeatures();
     console.log('audioFeatures', audioFeatures);
@@ -120,7 +120,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     getRecommendations(audioFeatures, genres).then(recommendations => {
         console.log('recommendations', recommendations);
         playSongs(player.device_id, shuffleArray(recommendations['tracks'].map(track => track.uri)));
-        document.getElementById('recommendations-button').innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> Search`;
+        document.getElementById('recommendations-button-icon').className = "fa-solid fa-magnifying-glass";
     });
     this.disabled = false;
   };
@@ -149,21 +149,22 @@ window.onSpotifyWebPlaybackSDKReady = () => {
 
   const likeButton = document.getElementById('like-button');
   likeButton.disabled = true;
-  likeButton.onclick = function() {
-    document.getElementById('like-button').innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
+  likeButton.onclick = function(event) {
+    const likeButtonIcon = event.target.id === "like-button-icon" ? event.target : event.target.querySelector('i');
+    likeButtonIcon.className = "fa-solid fa-spinner fa-spin";
     isSavedToLikedSongs(currentlyPlaying.spotifyId).then(response => {
         const isSavedToLikedSongs = response[0];
         if (isSavedToLikedSongs) {
             removeFromLikedSongs(currentlyPlaying.spotifyId).then(() => {
-                document.getElementById('like-button').innerHTML = `<i class="fa-regular fa-heart"></i>`;
+                likeButtonIcon.className = "fa-regular fa-heart";
             });
         } else {
             saveToLikedSongs(currentlyPlaying.spotifyId).then(() => {
-                document.getElementById('like-button').innerHTML = `<i class="fa-solid fa-heart"></i>`;
+                likeButtonIcon.className = "fa-solid fa-heart";
             });
         }
     }).catch(() => {
-        document.getElementById('like-button').innerHTML = `<i class="fa-regular fa-heart"></i>`
+        likeButtonIcon.className = "fa-regular fa-heart";
     });
   };
   likeButton.disabled = false;
@@ -216,26 +217,39 @@ function showPlaylistPicker(playlists) {
         .filter(playlist => !existingPlaylistIds.includes(playlist['id']))
         .sort((playlist1, playlist2) => playlist1.name.localeCompare(playlist2.name))
         .map(playlist => {
-            const playlistListItem = document.createElement('p');
+            const playlistListItem = document.createElement('div');
             let isClickEnabled = true;
             playlistListItem.onclick = (event) => {
                 if (!isClickEnabled) {
                     return;
                 }
                 isClickEnabled = false;
-                event.target.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`
+                const playlistName = document.getElementById(`playlist-list-item-name-${playlist.id}`);
+                playlistName.textContent = "";
+                const playlistIcon = document.getElementById(`playlist-list-item-icon-${playlist.id}`);
+                playlistIcon.className = "fa-solid fa-spinner fa-spin";
                 addSongsToPlaylist(playlist['id'], [currentlyPlaying.spotifyUri], 0)
                 .then(() => {
-                    event.target.querySelector('i').className = 'fa-solid fa-check';
+                    playlistIcon.className = "fa-solid fa-check";
                     setTimeout(() => {
-                        event.target.innerHTML = playlist.name;
+                        playlistName.textContent = playlist.name;
+                        playlistIcon.className = "hidden";
                         isClickEnabled = true;
                     }, 1000);
                 });
             };
+            const playlistName = document.createElement('p');
+            playlistName.id = `playlist-list-item-name-${playlist.id}`;
+            playlistName.textContent = playlist.name;
+
+            const newPlaylistIcon = document.createElement('i');
+            newPlaylistIcon.className = "hidden";
+            newPlaylistIcon.id = `playlist-list-item-icon-${playlist.id}`;
+
             playlistListItem.className = 'playlist-list-item';
-            playlistListItem.textContent = playlist.name;
             playlistListItem.dataset.playlistId = playlist['id'];
+
+            playlistListItem.append(playlistName, newPlaylistIcon);
             return playlistListItem;
         });
     playlistListElement.append(...newPlaylists);
