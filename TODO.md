@@ -2,8 +2,6 @@
 - [ ] fix layout which got messed up by my adding heart and plus buttons, which leak out of `currently-playing-right` div
 - add to playlist:
     - [ ] allow filtering/searching of playlists in modal
-    - [ ] schedule a background task to fetch user playlists so it is fetched ASAP but without affect other perf
-        - [ ] if, even pre-fetching user playlists, it still takes a long time to fetch user playlists when user clicks on plus button
     - [ ] **interesting**: consider having playlist modal open all the time as a side-view
 - [ ] use Spotify's Get User's Top Items API to personalize recommendations
 - [ ] give info about how many attributes selected at the top of the pills (so user doesn't have to scroll down and count)

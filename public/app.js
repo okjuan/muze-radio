@@ -48,7 +48,10 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   player.addListener('ready', ({ device_id }) => {
     console.log('Ready with Device ID', device_id);
     player.device_id = device_id;
-    transferPlayback(device_id);
+    transferPlayback(device_id).then(() => {
+        console.log("Pre-fetching user's playlists...");
+        getUserPlaylists().then(() => console.log("Done fetching user's playlists!"));
+    });
   });
 
   player.addListener('not_ready', ({ device_id }) => {

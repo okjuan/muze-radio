@@ -190,14 +190,14 @@ export function playSongs(device_id, spotify_uris) {
 
 export function getUserPlaylists() {
     if (userPlaylists) {
-        return Promise.resolve(userPlaylists);
+        return userPlaylists;
     }
-    return getCurrentUserId().then(userId => {
+    return (userPlaylists = getCurrentUserId().then(userId => {
         const editableByUser = (playlist) =>
             userId === playlist.owner.id || playlist.collaborative;
         return getUserPlaylistsRecursively(0, maxPlaylistsPerRequest)
             .then((playlists) => playlists.filter(editableByUser));
-    });
+    }));
 }
 
 export function getUserPlaylistsRecursively(offset, limit) {
@@ -214,7 +214,7 @@ export function getUserPlaylistsRecursively(offset, limit) {
             return getUserPlaylistsRecursively(offset + limit, limit)
                 .then(nextItems => data.items.concat(nextItems));
         } else {
-            return (userPlaylists = data.items);
+            return data.items;
         }
     });
 }
