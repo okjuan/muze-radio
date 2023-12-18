@@ -15,7 +15,7 @@ var userPlaylists = undefined;
 var userId = undefined;
 const userAuthDataKey = "userAuthData";
 const expiryBufferInSeconds = 5;
-const redirectUri = 'http://localhost:5000';
+const redirectUri = 'https://okjuan.me/muze-radio';
 let userAuthDataPromise = undefined;
 
 export function getUserAuth(spotifyScopes) {
