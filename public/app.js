@@ -45,9 +45,14 @@ window.onSpotifyWebPlaybackSDKReady = () => {
       getOAuthToken: cb => { cb(getUserAuth(spotifyScopes)); }
   });
 
+  let resolveDeviceId;
+  player.getDeviceId = new Promise((resolve) => {
+    resolveDeviceId = resolve;
+});
+
   player.addListener('ready', ({ device_id }) => {
     console.log('Ready with Device ID', device_id);
-    player.device_id = device_id;
+    resolveDeviceId(device_id);
     transferPlayback(device_id).then(() => {
         console.log("Pre-fetching user's playlists...");
         getUserPlaylists().then(() => console.log("Done fetching user's playlists!"));
@@ -122,8 +127,10 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     console.log('genres', genres);
     getRecommendations(audioFeatures, genres).then(recommendations => {
         console.log('recommendations', recommendations);
-        playSongs(player.device_id, shuffleArray(recommendations['tracks'].map(track => track.uri)));
-        document.getElementById('recommendations-button-icon').className = "fa-solid fa-magnifying-glass";
+        player.getDeviceId.then(device_id => {
+            playSongs(device_id, shuffleArray(recommendations['tracks'].map(track => track.uri)));
+            document.getElementById('recommendations-button-icon').className = "fa-solid fa-magnifying-glass";
+        });
     });
     this.disabled = false;
   };
