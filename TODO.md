@@ -1,8 +1,4 @@
-- [ ] publish the app!
-    - [x] manually copy static files to a `gh-pages` and test deploy
-        - all seems well!
-    - [x] refactor to use PKCE auth flow
-    - [ ] set up workflow that copies static files to `gh-pages` branch
+- [ ] set up workflow that copies static files to `gh-pages` branch
 - [ ] fix layout which got messed up by my adding heart and plus buttons, which leak out of `currently-playing-right` div
 - add to playlist:
     - [ ] allow filtering/searching of playlists in modal
