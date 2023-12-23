@@ -75,7 +75,12 @@ window.onSpotifyWebPlaybackSDKReady = () => {
       console.error(message);
   });
 
-  player.addListener('player_state_changed', ({ paused, track_window: { current_track } }) => {
+  player.addListener('player_state_changed', (args) => {
+    if (args === null || args === undefined) {
+        console.log('player_state_changed event triggered but args is null or undefined -- returning early from handler');
+        return;
+    }
+    const { paused, track_window: { current_track } } = args;
     document.getElementById('play-pause-button-icon').className = `fas ${paused? 'fa-play' : 'fa-pause'}`;
     var currentPlayingUpdated = false;
     if (currentlyPlaying.spotifyId != current_track['id']) {
