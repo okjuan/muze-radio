@@ -1,4 +1,3 @@
-- [ ] set up workflow that copies static files to `gh-pages` branch
 - [ ] fix layout which got messed up by my adding heart and plus buttons, which leak out of `currently-playing-right` div
 - add to playlist:
     - [ ] allow filtering/searching of playlists in modal
