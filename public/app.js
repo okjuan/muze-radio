@@ -173,7 +173,8 @@ window.onSpotifyWebPlaybackSDKReady = () => {
                 likeButtonIcon.className = "fa-solid fa-heart";
             });
         }
-    }).catch(() => {
+    }).catch((error) => {
+        console.log("Error occurred when handling button click on like button:" + error);
         likeButtonIcon.className = "fa-regular fa-heart";
     });
   };

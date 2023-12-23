@@ -171,7 +171,7 @@ export function removeFromLikedSongs(spotifyId) {
 }
 
 export function saveToLikedSongs(spotifyId) {
-    getUserAuth(['user-library-read']).then(authToken =>
+    return getUserAuth(['user-library-read']).then(authToken =>
         fetch(`https://api.spotify.com/v1/me/tracks`, {
             method: 'PUT',
             body: JSON.stringify({ ids: [spotifyId]}),
