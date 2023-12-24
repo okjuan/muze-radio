@@ -36,3 +36,12 @@ export const sha256 = (plain) => {
     const data = encoder.encode(plain)
     return window.crypto.subtle.digest('SHA-256', data)
 }
+
+export function wrapPromiseWithStatus(promise) {
+    var wrappingPromise = { state: 'pending', promise };
+    promise.then(
+        () => { wrappingPromise.state = 'fulfilled'; },
+        () => { wrappingPromise.state = 'rejected'; }
+    );
+    return wrappingPromise;
+}

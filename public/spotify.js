@@ -4,6 +4,7 @@ import {
     generateRandomString,
     isSubsetOf,
     sha256,
+    wrapPromiseWithStatus,
 } from './utils.js';
 
 const clientId = '8efedd3d29214978b2a0e6e63444974b';
@@ -20,55 +21,63 @@ let userAuthDataPromise = undefined;
 
 export function getUserAuth(spotifyScopes) {
     var userAuthData = JSON.parse(localStorage.getItem(userAuthDataKey));
-    if (userAuthDataPromise) {
-        return userAuthDataPromise;
+    if (userAuthDataPromise && userAuthDataPromise.state === 'pending') {
+        return userAuthDataPromise.promise;
     }
-    if (shouldFetchNewToken(userAuthData, spotifyScopes)) {
-        if (!window.location.search) {
-            // Step 1: Generate a code verifier and a code challenge
-            let codeVerifier = generateRandomString(128);
-            localStorage.setItem('code_verifier', codeVerifier);
-
-            sha256(codeVerifier).then((hash) => {
-                // Step 2: Redirect the user to the authorization endpoint
-                let authUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(spotifyScopes.join(' '))}&code_challenge=${base64encode(hash)}&code_challenge_method=S256`;
-                window.location.href = authUrl;
-            });
-            return undefined;
-        }
-        // Step 3: Get the authorization code from the query string
-        let urlParams = new URLSearchParams(window.location.search);
-        let authCode = urlParams.get('code');
-        window.history.replaceState({}, document.title, window.location.pathname);
-
-        // Step 4: Exchange the authorization code for an access token
-        return (userAuthDataPromise = fetch('https://accounts.spotify.com/api/token', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({
-                client_id: clientId,
-                grant_type: 'authorization_code',
-                code: authCode,
-                redirect_uri: redirectUri,
-                code_verifier: localStorage.getItem('code_verifier'),
-            }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            // properties: access_token, token_type, scope, expires_in, refresh_token
-            const now = new Date().getTime();
-            data['expiresAt'] = now + (data['expires_in'] - expiryBufferInSeconds) * 1000;
-            console.log('userAuthData', data);
-            localStorage.setItem(userAuthDataKey, JSON.stringify(data));
-            return data['access_token'];
-        }));
+    if (shouldPromptForUserAuth(userAuthData, spotifyScopes)) {
+        const request = requestToken(spotifyScopes);
+        userAuthDataPromise = wrapPromiseWithStatus(request);
+        return request;
+    }
+    if (shouldRenewToken(userAuthData)) {
+        const request = refreshAccessToken(userAuthData);
+        userAuthDataPromise = wrapPromiseWithStatus(request);
+        return request;
     }
     return Promise.resolve(userAuthData['access_token']);
 }
 
-const shouldFetchNewToken = (userAuthData, scopes) => {
+function requestToken(spotifyScopes) {
+    if (!window.location.search) {
+        // Step 1: Generate a code verifier and a code challenge
+        let codeVerifier = generateRandomString(128);
+        localStorage.setItem('code_verifier', codeVerifier);
+
+        sha256(codeVerifier).then((hash) => {
+            // Step 2: Redirect the user to the authorization endpoint
+            let authUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(spotifyScopes.join(' '))}&code_challenge=${base64encode(hash)}&code_challenge_method=S256`;
+            window.location.href = authUrl;
+        });
+        return Promise.resolve(undefined);
+    }
+    // Step 3: Get the authorization code from the query string
+    let urlParams = new URLSearchParams(window.location.search);
+    let authCode = urlParams.get('code');
+    window.history.replaceState({}, document.title, window.location.pathname);
+
+    // Step 4: Exchange the authorization code for an access token
+    return fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+            client_id: clientId,
+            grant_type: 'authorization_code',
+            code: authCode,
+            redirect_uri: redirectUri,
+            code_verifier: localStorage.getItem('code_verifier'),
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Got token from user auth", data);
+        cacheUserAuthData(data);
+        return data['access_token'];
+    });
+}
+
+const shouldPromptForUserAuth = (userAuthData, scopes) => {
     if (!userAuthData) {
         console.log('No token found');
         return true;
@@ -76,12 +85,43 @@ const shouldFetchNewToken = (userAuthData, scopes) => {
         console.log('New scopes requested');
         return true;
     }
-    const now = new Date().getTime();
-    if (userAuthData['expiresAt'] < now) {
-        console.log('Token expired');
-        return true;
-    }
     return false;
+}
+
+function shouldRenewToken(userAuthData) {
+    const now = new Date().getTime();
+    return userAuthData['expiresAt'] < now;
+}
+
+function refreshAccessToken(userAuthData) {
+    return fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+            grant_type: 'refresh_token',
+            refresh_token: userAuthData.refresh_token,
+            client_id: clientId
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            throw new Error(data.error);
+        } else {
+            console.log("Refreshed token", data);
+            cacheUserAuthData(data);
+            return data;
+        }
+    });
+}
+
+function cacheUserAuthData(userAuthData) {
+    // properties: access_token, token_type, scope, expires_in, refresh_token
+    const now = new Date().getTime();
+    userAuthData['expiresAt'] = now + (userAuthData['expires_in'] - expiryBufferInSeconds) * 1000;
+    localStorage.setItem(userAuthDataKey, JSON.stringify(userAuthData));
 }
 
 export function addSongsToPlaylist(playlistId, songUris, position=undefined) {
