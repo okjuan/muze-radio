@@ -1,6 +1,7 @@
 import {
     addSongsToPlaylist,
     getAlbum,
+    getSong,
     getRecommendations,
     getUserAuth,
     getUserPlaylists,
@@ -16,7 +17,9 @@ import { shuffleArray } from './utils.js';
 
 var currentlyPlaying = {
     artist: undefined,
+    songName: undefined,
     song: undefined,
+    songUri: undefined,
     album: undefined,
     albumUri: undefined,
     albumName: undefined,
@@ -99,9 +102,18 @@ window.onSpotifyWebPlaybackSDKReady = () => {
         document.getElementById('artist-name-text').textContent = ` ${currentlyPlaying.artist}`;
         currentPlayingUpdated = true;
     }
-    if (currentlyPlaying.song != current_track['name']) {
-        currentlyPlaying.song = current_track['name'];
-        document.getElementById('song-name-text').textContent = ` ${currentlyPlaying.song}`;
+    if (currentlyPlaying.songUri != current_track['uri']) {
+        currentlyPlaying.songName = current_track['name'];
+        currentlyPlaying.songUri = current_track['uri'];
+        const songNameElement = document.getElementById('song-name-text');
+        songNameElement.textContent = ` ${current_track['name']}`;
+        getSong(current_track['id']).then(song => {
+            currentlyPlaying.song = song;
+            songNameElement.className += " clickable";
+            songNameElement.onclick = () => {
+                window.open(song.external_urls.spotify, '_blank');
+            };
+        });
         currentPlayingUpdated = true;
     }
     if (currentlyPlaying.albumUri != current_track['album']['uri']) {

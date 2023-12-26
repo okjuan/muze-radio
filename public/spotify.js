@@ -285,6 +285,10 @@ export function getUserPlaylistsRecursively(offset, limit) {
 export function getAlbum(albumUri) {
     return getUserAuth([]).then(authToken =>
         fetch(`https://api.spotify.com/v1/albums/${albumUri}`, {
+
+export function getSong(songId) {
+    return getUserAuth([]).then(authToken =>
+        fetch(`https://api.spotify.com/v1/tracks/${songId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
