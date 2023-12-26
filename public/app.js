@@ -13,10 +13,10 @@ import {
     spotifySeedGenres,
     transferPlayback
 } from './spotify.js';
-import { shuffleArray } from './utils.js';
+import { arraysAreEqual, shuffleArray } from './utils.js';
 
 var currentlyPlaying = {
-    artist: undefined,
+    artistNames: undefined,
     songName: undefined,
     song: undefined,
     songUri: undefined,
@@ -97,9 +97,12 @@ window.onSpotifyWebPlaybackSDKReady = () => {
         currentlyPlaying.spotifyUri = current_track['uri'];
         currentPlayingUpdated = true;
     }
-    if (currentlyPlaying.artist != current_track['artists'][0]['name']) {
-        currentlyPlaying.artist = current_track['artists'][0]['name'];
-        document.getElementById('artist-name-text').textContent = ` ${currentlyPlaying.artist}`;
+    if (!arraysAreEqual(currentlyPlaying.artistUris ?? [], current_track['artists'].map(a => a.uri))) {
+        currentlyPlaying.artistUris = current_track['artists'].map(a => a.uri);
+        currentlyPlaying.artistNames = current_track['artists']
+            .map(artist => artist.name)
+            .join(', ');
+        document.getElementById('artist-name-text').textContent = ` ${currentlyPlaying.artistNames}`;
         currentPlayingUpdated = true;
     }
     if (currentlyPlaying.songUri != current_track['uri']) {

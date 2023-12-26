@@ -14,6 +14,10 @@ export function chunkArray(array, chunkSize) {
     return chunks;
 }
 
+export function arraysAreEqual(arr1, arr2) {
+    return arr1.length === arr2.length && arr1.every((arr1Item, i) => arr1Item === arr2[i]);
+}
+
 export function isSubsetOf(arr1, arr2) {
     return arr2.every(arr2Item => arr1.includes(arr2Item));
 }
