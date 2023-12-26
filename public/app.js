@@ -1,5 +1,6 @@
 import {
     addSongsToPlaylist,
+    getAlbum,
     getRecommendations,
     getUserAuth,
     getUserPlaylists,
@@ -17,6 +18,7 @@ var currentlyPlaying = {
     artist: undefined,
     song: undefined,
     album: undefined,
+    albumName: undefined,
     coverArtUrl: undefined,
     spotifyUri: undefined,
     spotifyId: undefined,
@@ -103,12 +105,21 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     }
     if (currentlyPlaying.coverArtUrl != current_track['album']['images'][0]['url']) {
         currentlyPlaying.coverArtUrl = current_track['album']['images'][0]['url'];
-        document.getElementById('cover-art').src = currentlyPlaying.coverArtUrl;
+        const coverArtImg = document.getElementById('cover-art')
+        coverArtImg.src = currentlyPlaying.coverArtUrl;
+        const albumId = current_track['album']['uri'].split(':')[2];
+        getAlbum(albumId).then(album => {
+            currentlyPlaying.album = album;
+            coverArtImg.className += "clickable";
+            coverArtImg.onclick = function() {
+                window.open(album.external_urls.spotify, '_blank');
+            }
+        });
         currentPlayingUpdated = true;
     }
-    if (currentlyPlaying.album != current_track['album']['name']) {
-        currentlyPlaying.album = current_track['album']['name'];
-        document.getElementById('album-name-text').textContent = ` ${currentlyPlaying.album}`;
+    if (currentlyPlaying.albumName != current_track['album']['name']) {
+        currentlyPlaying.albumName = current_track['album']['name'];
+        document.getElementById('album-name-text').textContent = ` ${currentlyPlaying.albumName}`;
         currentPlayingUpdated = true;
     }
     if (currentPlayingUpdated) {

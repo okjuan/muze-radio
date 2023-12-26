@@ -281,3 +281,16 @@ export function getUserPlaylistsRecursively(offset, limit) {
         }
     });
 }
+
+export function getAlbum(albumUri) {
+    return getUserAuth([]).then(authToken =>
+        fetch(`https://api.spotify.com/v1/albums/${albumUri}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+        })
+    )
+    .then(response => response.json());
+}

@@ -179,3 +179,7 @@ button:hover {
     max-width: 50%;
     padding: 0px 5vw;
 }
+
+.clickable:hover {
+    cursor: pointer;
+}
