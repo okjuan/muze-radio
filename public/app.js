@@ -118,8 +118,8 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     }
     if (currentlyPlaying.albumUri != current_track['album']['uri']) {
         currentlyPlaying.albumName = current_track['album']['name'];
-        const albumName = document.getElementById('album-name-text');
-        albumName.textContent = ` ${currentlyPlaying.albumName}`;
+        const albumNameElement = document.getElementById('album-name-text');
+        albumNameElement.textContent = ` ${currentlyPlaying.albumName}`;
 
         currentlyPlaying.coverArtUrl = current_track['album']['images'][0]['url'];
         const coverArtImg = document.getElementById('cover-art')
@@ -129,8 +129,8 @@ window.onSpotifyWebPlaybackSDKReady = () => {
         getAlbum(albumId).then(album => {
             currentlyPlaying.album = album;
             coverArtImg.className += " clickable";
-            albumName.className += " clickable";
-            coverArtImg.onclick = (albumName.onclick = () => {
+            albumNameElement.className += " clickable";
+            coverArtImg.onclick = (albumNameElement.onclick = () => {
                 window.open(album.external_urls.spotify, '_blank');
             });
         });
