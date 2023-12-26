@@ -1,6 +1,8 @@
 import {
     addSongsToPlaylist,
     getAlbum,
+    getArtists,
+    getIdFromUri,
     getSong,
     getRecommendations,
     getUserAuth,
@@ -99,10 +101,26 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     }
     if (!arraysAreEqual(currentlyPlaying.artistUris ?? [], current_track['artists'].map(a => a.uri))) {
         currentlyPlaying.artistUris = current_track['artists'].map(a => a.uri);
+        const artistNameElement = document.getElementById('artist-name-text');
         currentlyPlaying.artistNames = current_track['artists']
             .map(artist => artist.name)
             .join(', ');
-        document.getElementById('artist-name-text').textContent = ` ${currentlyPlaying.artistNames}`;
+        artistNameElement.textContent = ` ${currentlyPlaying.artistNames}`;
+        getArtists(current_track['artists'].map(a => getIdFromUri(a.uri))).then(artists => {
+            // Set artist names to empty string to clear it
+            artistNameElement.textContent = "";
+            var delimiter = " ";
+            artists.artists.forEach(artist => {
+                const artistName = document.createElement('span');
+                artistName.textContent = `${delimiter}${artist.name}`;
+                artistName.className += " clickable";
+                artistName.onclick = () => {
+                    window.open(artist.external_urls.spotify, '_blank');
+                };
+                artistNameElement.appendChild(artistName);
+                delimiter = ", ";
+            });
+        });
         currentPlayingUpdated = true;
     }
     if (currentlyPlaying.songUri != current_track['uri']) {
@@ -128,7 +146,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
         const coverArtImg = document.getElementById('cover-art')
         coverArtImg.src = currentlyPlaying.coverArtUrl;
 
-        const albumId = current_track['album']['uri'].split(':')[2];
+        const albumId = getIdFromUri(current_track['album']['uri']);
         getAlbum(albumId).then(album => {
             currentlyPlaying.album = album;
             coverArtImg.className += " clickable";

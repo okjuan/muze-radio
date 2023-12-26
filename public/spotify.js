@@ -307,3 +307,20 @@ export function getSong(songId) {
     )
     .then(response => response.json());
 }
+
+export function getArtists(artistIds) {
+    return getUserAuth([]).then(authToken =>
+        fetch(`https://api.spotify.com/v1/artists?ids=${artistIds.join(',')}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+        })
+    )
+    .then(response => response.json());
+}
+
+export function getIdFromUri(uri) {
+    return uri.split(':')[2];
+}
