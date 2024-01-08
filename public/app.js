@@ -17,6 +17,8 @@ import {
 } from './spotify.js';
 import { arraysAreEqual, shuffleArray } from './utils.js';
 
+var USER_MESSAGE_TIMEOUT_MS = 3000;
+
 var currentlyPlaying = {
     artistNames: undefined,
     songName: undefined,
@@ -218,15 +220,18 @@ window.onSpotifyWebPlaybackSDKReady = () => {
         if (isSavedToLikedSongs) {
             removeFromLikedSongs(currentlyPlaying.spotifyId).then(() => {
                 likeButtonIcon.className = "fa-regular fa-heart";
+                showMessageToUser("Removed from Liked Songs");
             });
         } else {
             saveToLikedSongs(currentlyPlaying.spotifyId).then(() => {
                 likeButtonIcon.className = "fa-solid fa-heart";
+                showMessageToUser("Added to Liked Songs");
             });
         }
     }).catch((error) => {
         console.log("Error occurred when handling button click on like button:" + error);
         likeButtonIcon.className = "fa-regular fa-heart";
+        showMessageToUser("Sorry, that didn't work. Please try again later.");
     });
   };
   likeButton.disabled = false;
@@ -245,6 +250,15 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     };
   plusButton.disabled = false;
 };
+
+function showMessageToUser(message) {
+    const messageElement = document.getElementById('message-to-user');
+    messageElement.textContent = message;
+    messageElement.style.opacity = '1';
+    setTimeout(() => {
+        messageElement.style.opacity = '0';
+    }, USER_MESSAGE_TIMEOUT_MS);
+}
 
 document.addEventListener('keyup', function onDocumentKeyUp(event) {
     const playlistListModal = document.getElementById('playlist-list-container');
@@ -292,6 +306,7 @@ function showPlaylistPicker(playlists) {
                 playlistIcon.className = "fa-solid fa-spinner fa-spin";
                 addSongsToPlaylist(playlist['id'], [currentlyPlaying.spotifyUri], 0)
                 .then(() => {
+                    showMessageToUser(`Track '${currentlyPlaying.songName}' added to playlist '${playlist.name}'`);
                     playlistIcon.className = "fa-solid fa-check";
                     setTimeout(() => {
                         playlistName.textContent = playlist.name;

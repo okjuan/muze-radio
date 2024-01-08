@@ -28,6 +28,21 @@ button:hover {
     display: none;
 }
 
+#message-to-user {
+    position: fixed;
+    top: 1vh;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1000;
+    text-align: center;
+    opacity: 0; /* Initially transparent */
+    transition: opacity 0.5s; /* Transition effect */
+}
+
 #currently-playing {
     display: flex;
     align-items: center;
