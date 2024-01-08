@@ -108,20 +108,19 @@ window.onSpotifyWebPlaybackSDKReady = () => {
             .map(artist => artist.name)
             .join(', ');
         artistNameElement.textContent = ` ${currentlyPlaying.artistNames}`;
-        getArtists(current_track['artists'].map(a => getIdFromUri(a.uri))).then(artists => {
-            // Set artist names to empty string to clear it
-            artistNameElement.textContent = "";
-            var delimiter = " ";
-            artists.artists.forEach(artist => {
-                const artistName = document.createElement('span');
-                artistName.textContent = `${delimiter}${artist.name}`;
-                artistName.className += " clickable";
-                artistName.onclick = () => {
-                    window.open(artist.external_urls.spotify, '_blank');
-                };
-                artistNameElement.appendChild(artistName);
-                delimiter = ", ";
-            });
+        const artistIds = current_track['artists'].map(a => getIdFromUri(a.uri));
+        getArtists(artistIds)
+        .then(artists => addSpotifyLinksToArtistNames(artists))
+        .catch((error) => {
+            console.log("Retrying getArtists() since it failed the first time: " + error);
+            setTimeout(() => {
+                getArtists(artistIds)
+                .then(artists => addSpotifyLinksToArtistNames(artists))
+                .catch((error) => {
+                    console.log("Error occurred on retry of fetching artists: " + error);
+                });
+            }, 1000);
+
         });
         currentPlayingUpdated = true;
     }
@@ -250,6 +249,22 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     };
   plusButton.disabled = false;
 };
+
+function addSpotifyLinksToArtistNames(artists) {
+    const artistNameElement = document.getElementById('artist-name-text');
+    artistNameElement.textContent = "";
+    var delimiter = " ";
+    artists.artists.forEach(artist => {
+        const artistName = document.createElement('span');
+        artistName.textContent = `${delimiter}${artist.name}`;
+        artistName.className += " clickable";
+        artistName.onclick = () => {
+            window.open(artist.external_urls.spotify, '_blank');
+        };
+        artistNameElement.appendChild(artistName);
+        delimiter = ", ";
+    });
+}
 
 function showMessageToUser(message) {
     const messageElement = document.getElementById('message-to-user');

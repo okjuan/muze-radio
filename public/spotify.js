@@ -318,7 +318,13 @@ export function getArtists(artistIds) {
             },
         })
     )
-    .then(response => response.json());
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        return data;
+    });
 }
 
 export function getIdFromUri(uri) {
