@@ -1,3 +1,18 @@
+high pri:
+- [ ] fix styling of song metadata when song/artist/album names are long (test with Classical music)
+- [ ] support filtering/searching of playlists in modal that appears when '+' (add to playlist) button clicked
+- [ ] show songs that are in queue
+- [ ] make search button bigger and/or style it to draw more attention
+
+feature work: sliders
+- [ ] replace sliders with sliders with two controls that allow setting a range
+    - this will probably require a bit of work; see [this StackOverflow Q](https://stackoverflow.com/q/4753946)
+- [ ] indicate audio feature value for currently playing song with a blinking/pulsating sound icon that appears on the sliders
+    - e.g. Font Awesome's `volume-high` icon with `beat` animation: `<i class="fa-solid fa-volume-high fa-beat"></i>`
+
+---
+
+backlog:
 - [ ] implement Spotify's branding requirements and request extended quota
 - [ ] remove token from local storage if it's expired or absent or bad
 - [ ] optimization: parallelize requests to fetch all user's playlists
@@ -6,7 +21,6 @@
 - [ ] code style: use `.property` access notation everywhere rather than `['property']` notation
 - [ ] fix layout which got messed up by my adding heart and plus buttons, which leak out of `currently-playing-right` div
 - add to playlist:
-    - [ ] allow filtering/searching of playlists in modal
     - [ ] **interesting**: consider having playlist modal open all the time as a side-view
 - [ ] use Spotify's Get User's Top Items API to personalize recommendations
 - [ ] give info about how many attributes selected at the top of the pills (so user doesn't have to scroll down and count)
