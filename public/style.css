@@ -58,6 +58,11 @@ button:hover {
     padding: 5px;
 }
 
+#spotify-logo {
+    height: 70px;
+    padding: 35px;
+}
+
 #recommendations-button-container {
     padding: 3vh 0vw;
 }
