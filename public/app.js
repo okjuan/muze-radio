@@ -18,8 +18,7 @@ import {
 import { arraysAreEqual, shuffleArray } from './utils.js';
 
 var USER_MESSAGE_TIMEOUT_MS = 3000;
-
-var currentlyPlaying = {
+var CURRENTLY_PLAYING = {
     artistNames: undefined,
     songName: undefined,
     song: undefined,
@@ -31,8 +30,8 @@ var currentlyPlaying = {
     spotifyUri: undefined,
     spotifyId: undefined,
 };
-var playlistPickerShowing = false;
-export const spotifyScopes = [
+var PLAYLIST_PICKER_SHOWING = false;
+export const SPOTIFY_SCOPES = [
     'streaming',
     'user-read-private',
     'user-read-playback-state',
@@ -47,12 +46,12 @@ export const spotifyScopes = [
     'playlist-modify-public',
 ];
 
-getUserAuth(spotifyScopes);
+getUserAuth(SPOTIFY_SCOPES);
 
 window.onSpotifyWebPlaybackSDKReady = () => {
   const player = new Spotify.Player({
       name: 'Muze Radio',
-      getOAuthToken: cb => { cb(getUserAuth(spotifyScopes)); }
+      getOAuthToken: cb => { cb(getUserAuth(SPOTIFY_SCOPES)); }
   });
 
   let resolveDeviceId;
@@ -93,21 +92,21 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     const { paused, track_window: { current_track } } = args;
     document.getElementById('play-pause-button-icon').className = `fas ${paused? 'fa-play' : 'fa-pause'}`;
     var currentPlayingUpdated = false;
-    if (currentlyPlaying.spotifyId != current_track['id']) {
-        currentlyPlaying.spotifyId = current_track['id'];
+    if (CURRENTLY_PLAYING.spotifyId != current_track['id']) {
+        CURRENTLY_PLAYING.spotifyId = current_track['id'];
         currentPlayingUpdated = true;
     }
-    if (currentlyPlaying.spotifyUri != current_track['uri']) {
-        currentlyPlaying.spotifyUri = current_track['uri'];
+    if (CURRENTLY_PLAYING.spotifyUri != current_track['uri']) {
+        CURRENTLY_PLAYING.spotifyUri = current_track['uri'];
         currentPlayingUpdated = true;
     }
-    if (!arraysAreEqual(currentlyPlaying.artistUris ?? [], current_track['artists'].map(a => a.uri))) {
-        currentlyPlaying.artistUris = current_track['artists'].map(a => a.uri);
+    if (!arraysAreEqual(CURRENTLY_PLAYING.artistUris ?? [], current_track['artists'].map(a => a.uri))) {
+        CURRENTLY_PLAYING.artistUris = current_track['artists'].map(a => a.uri);
         const artistNameElement = document.getElementById('artist-name-text');
-        currentlyPlaying.artistNames = current_track['artists']
+        CURRENTLY_PLAYING.artistNames = current_track['artists']
             .map(artist => artist.name)
             .join(', ');
-        artistNameElement.textContent = ` ${currentlyPlaying.artistNames}`;
+        artistNameElement.textContent = ` ${CURRENTLY_PLAYING.artistNames}`;
         const artistIds = current_track['artists'].map(a => getIdFromUri(a.uri));
         getArtists(artistIds)
         .then(artists => addSpotifyLinksToArtistNames(artists))
@@ -124,13 +123,13 @@ window.onSpotifyWebPlaybackSDKReady = () => {
         });
         currentPlayingUpdated = true;
     }
-    if (currentlyPlaying.songUri != current_track['uri']) {
-        currentlyPlaying.songName = current_track['name'];
-        currentlyPlaying.songUri = current_track['uri'];
+    if (CURRENTLY_PLAYING.songUri != current_track['uri']) {
+        CURRENTLY_PLAYING.songName = current_track['name'];
+        CURRENTLY_PLAYING.songUri = current_track['uri'];
         const songNameElement = document.getElementById('song-name-text');
         songNameElement.textContent = ` ${current_track['name']}`;
         getSong(current_track['id']).then(song => {
-            currentlyPlaying.song = song;
+            CURRENTLY_PLAYING.song = song;
             songNameElement.className += " clickable";
             songNameElement.onclick = () => {
                 window.open(song.external_urls.spotify, '_blank');
@@ -138,18 +137,18 @@ window.onSpotifyWebPlaybackSDKReady = () => {
         });
         currentPlayingUpdated = true;
     }
-    if (currentlyPlaying.albumUri != current_track['album']['uri']) {
-        currentlyPlaying.albumName = current_track['album']['name'];
+    if (CURRENTLY_PLAYING.albumUri != current_track['album']['uri']) {
+        CURRENTLY_PLAYING.albumName = current_track['album']['name'];
         const albumNameElement = document.getElementById('album-name-text');
-        albumNameElement.textContent = ` ${currentlyPlaying.albumName}`;
+        albumNameElement.textContent = ` ${CURRENTLY_PLAYING.albumName}`;
 
-        currentlyPlaying.coverArtUrl = current_track['album']['images'][0]['url'];
+        CURRENTLY_PLAYING.coverArtUrl = current_track['album']['images'][0]['url'];
         const coverArtImg = document.getElementById('cover-art')
-        coverArtImg.src = currentlyPlaying.coverArtUrl;
+        coverArtImg.src = CURRENTLY_PLAYING.coverArtUrl;
 
         const albumId = getIdFromUri(current_track['album']['uri']);
         getAlbum(albumId).then(album => {
-            currentlyPlaying.album = album;
+            CURRENTLY_PLAYING.album = album;
             coverArtImg.className += " clickable";
             albumNameElement.className += " clickable";
             coverArtImg.onclick = (albumNameElement.onclick = () => {
@@ -160,7 +159,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     }
     if (currentPlayingUpdated) {
         document.getElementById('currently-playing').style.display = 'flex';
-        isSavedToLikedSongs(currentlyPlaying.spotifyId).then(response => {
+        isSavedToLikedSongs(CURRENTLY_PLAYING.spotifyId).then(response => {
             document.getElementById('like-button-icon').className = `${response[0]? 'fa-solid fa-heart' : 'fa-regular fa-heart'}`
         });
     }
@@ -214,15 +213,15 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   likeButton.onclick = function(event) {
     const likeButtonIcon = event.target.id === "like-button-icon" ? event.target : event.target.querySelector('i');
     likeButtonIcon.className = "fa-solid fa-spinner fa-spin";
-    isSavedToLikedSongs(currentlyPlaying.spotifyId).then(response => {
+    isSavedToLikedSongs(CURRENTLY_PLAYING.spotifyId).then(response => {
         const isSavedToLikedSongs = response[0];
         if (isSavedToLikedSongs) {
-            removeFromLikedSongs(currentlyPlaying.spotifyId).then(() => {
+            removeFromLikedSongs(CURRENTLY_PLAYING.spotifyId).then(() => {
                 likeButtonIcon.className = "fa-regular fa-heart";
                 showMessageToUser("Removed from Liked Songs");
             });
         } else {
-            saveToLikedSongs(currentlyPlaying.spotifyId).then(() => {
+            saveToLikedSongs(CURRENTLY_PLAYING.spotifyId).then(() => {
                 likeButtonIcon.className = "fa-solid fa-heart";
                 showMessageToUser("Added to Liked Songs");
             });
@@ -279,12 +278,12 @@ document.addEventListener('keyup', function onDocumentKeyUp(event) {
     const playlistListModal = document.getElementById('playlist-list-container');
     if (playlistListModal && event.key === 'Escape') {
         playlistListModal.style.display = 'none';
-        playlistPickerShowing = false;
+        PLAYLIST_PICKER_SHOWING = false;
     }
 });
 
 document.addEventListener('click', function(event) {
-    if (!playlistPickerShowing) {
+    if (!PLAYLIST_PICKER_SHOWING) {
         return;
     }
     const playlistListModal = document.getElementById('playlist-list-container');
@@ -294,7 +293,7 @@ document.addEventListener('click', function(event) {
     const addButtonClicked = addButton.contains(event.target) || addButton === event.target;
     if (playlistListModal && !playlistListClicked && !addButtonClicked) {
         playlistListModal.style.display = 'none';
-        playlistPickerShowing = false;
+        PLAYLIST_PICKER_SHOWING = false;
     }
 });
 
@@ -319,9 +318,9 @@ function showPlaylistPicker(playlists) {
                 playlistName.textContent = "";
                 const playlistIcon = document.getElementById(`playlist-list-item-icon-${playlist.id}`);
                 playlistIcon.className = "fa-solid fa-spinner fa-spin";
-                addSongsToPlaylist(playlist['id'], [currentlyPlaying.spotifyUri], 0)
+                addSongsToPlaylist(playlist['id'], [CURRENTLY_PLAYING.spotifyUri], 0)
                 .then(() => {
-                    showMessageToUser(`Track '${currentlyPlaying.songName}' added to playlist '${playlist.name}'`);
+                    showMessageToUser(`Track '${CURRENTLY_PLAYING.songName}' added to playlist '${playlist.name}'`);
                     playlistIcon.className = "fa-solid fa-check";
                     setTimeout(() => {
                         playlistName.textContent = playlist.name;
@@ -347,7 +346,7 @@ function showPlaylistPicker(playlists) {
     playlistListElement.append(...newPlaylists);
     const playlistListModal = document.getElementById('playlist-list-container');
     playlistListModal.style.display = 'block';
-    playlistPickerShowing = true;
+    PLAYLIST_PICKER_SHOWING = true;
 }
 
 const genresContainer = document.querySelector('.pills-container');
