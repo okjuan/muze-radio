@@ -105,37 +105,11 @@ window.onSpotifyWebPlaybackSDKReady = () => {
         currentPlayingUpdated = true;
     }
     if (CURRENTLY_PLAYING.songUri != current_track['uri']) {
-        CURRENTLY_PLAYING.songName = current_track['name'];
-        CURRENTLY_PLAYING.songUri = current_track['uri'];
-        const songNameElement = document.getElementById('song-name-text');
-        songNameElement.textContent = ` ${current_track['name']}`;
-        getSong(current_track['id']).then(song => {
-            CURRENTLY_PLAYING.song = song;
-            songNameElement.className += " clickable";
-            songNameElement.onclick = () => {
-                window.open(song.external_urls.spotify, '_blank');
-            };
-        });
+        updateCurrentlyPlayingSong(current_track);
         currentPlayingUpdated = true;
     }
     if (CURRENTLY_PLAYING.albumUri != current_track['album']['uri']) {
-        CURRENTLY_PLAYING.albumName = current_track['album']['name'];
-        const albumNameElement = document.getElementById('album-name-text');
-        albumNameElement.textContent = ` ${CURRENTLY_PLAYING.albumName}`;
-
-        CURRENTLY_PLAYING.coverArtUrl = current_track['album']['images'][0]['url'];
-        const coverArtImg = document.getElementById('cover-art')
-        coverArtImg.src = CURRENTLY_PLAYING.coverArtUrl;
-
-        const albumId = getIdFromUri(current_track['album']['uri']);
-        getAlbum(albumId).then(album => {
-            CURRENTLY_PLAYING.album = album;
-            coverArtImg.className += " clickable";
-            albumNameElement.className += " clickable";
-            coverArtImg.onclick = (albumNameElement.onclick = () => {
-                window.open(album.external_urls.spotify, '_blank');
-            });
-        });
+        updateCurrentlyPlayingAlbum(current_track);
         currentPlayingUpdated = true;
     }
     if (currentPlayingUpdated) {
@@ -249,6 +223,40 @@ function updateCurrentlyPlayingArtists(current_track) {
                 console.log("Error occurred on retry of fetching artists: " + error);
             });
         }, 1000);
+    });
+}
+
+function updateCurrentlyPlayingSong(current_track) {
+    CURRENTLY_PLAYING.songName = current_track['name'];
+    CURRENTLY_PLAYING.songUri = current_track['uri'];
+    const songNameElement = document.getElementById('song-name-text');
+    songNameElement.textContent = ` ${current_track['name']}`;
+    getSong(current_track['id']).then(song => {
+        CURRENTLY_PLAYING.song = song;
+        songNameElement.className += " clickable";
+        songNameElement.onclick = () => {
+            window.open(song.external_urls.spotify, '_blank');
+        };
+    });
+}
+
+function updateCurrentlyPlayingAlbum(current_track) {
+    CURRENTLY_PLAYING.albumName = current_track['album']['name'];
+    const albumNameElement = document.getElementById('album-name-text');
+    albumNameElement.textContent = ` ${CURRENTLY_PLAYING.albumName}`;
+
+    CURRENTLY_PLAYING.coverArtUrl = current_track['album']['images'][0]['url'];
+    const coverArtImg = document.getElementById('cover-art')
+    coverArtImg.src = CURRENTLY_PLAYING.coverArtUrl;
+
+    const albumId = getIdFromUri(current_track['album']['uri']);
+    getAlbum(albumId).then(album => {
+        CURRENTLY_PLAYING.album = album;
+        coverArtImg.className += " clickable";
+        albumNameElement.className += " clickable";
+        coverArtImg.onclick = (albumNameElement.onclick = () => {
+            window.open(album.external_urls.spotify, '_blank');
+        });
     });
 }
 
