@@ -101,26 +101,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
         currentPlayingUpdated = true;
     }
     if (!arraysAreEqual(CURRENTLY_PLAYING.artistUris ?? [], current_track['artists'].map(a => a.uri))) {
-        CURRENTLY_PLAYING.artistUris = current_track['artists'].map(a => a.uri);
-        const artistNameElement = document.getElementById('artist-name-text');
-        CURRENTLY_PLAYING.artistNames = current_track['artists']
-            .map(artist => artist.name)
-            .join(', ');
-        artistNameElement.textContent = ` ${CURRENTLY_PLAYING.artistNames}`;
-        const artistIds = current_track['artists'].map(a => getIdFromUri(a.uri));
-        getArtists(artistIds)
-        .then(artists => addSpotifyLinksToArtistNames(artists))
-        .catch((error) => {
-            console.log("Retrying getArtists() since it failed the first time: " + error);
-            setTimeout(() => {
-                getArtists(artistIds)
-                .then(artists => addSpotifyLinksToArtistNames(artists))
-                .catch((error) => {
-                    console.log("Error occurred on retry of fetching artists: " + error);
-                });
-            }, 1000);
-
-        });
+        updateCurrentlyPlayingArtists(current_track);
         currentPlayingUpdated = true;
     }
     if (CURRENTLY_PLAYING.songUri != current_track['uri']) {
@@ -248,6 +229,28 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     };
   plusButton.disabled = false;
 };
+
+function updateCurrentlyPlayingArtists(current_track) {
+    CURRENTLY_PLAYING.artistUris = current_track['artists'].map(a => a.uri);
+    CURRENTLY_PLAYING.artistNames = current_track['artists']
+        .map(artist => artist.name)
+        .join(', ');
+    const artistNameElement = document.getElementById('artist-name-text');
+    artistNameElement.textContent = ` ${CURRENTLY_PLAYING.artistNames}`;
+    const artistIds = current_track['artists'].map(a => getIdFromUri(a.uri));
+    getArtists(artistIds)
+    .then(artists => addSpotifyLinksToArtistNames(artists))
+    .catch((error) => {
+        console.log("Retrying getArtists() since it failed the first time: " + error);
+        setTimeout(() => {
+            getArtists(artistIds)
+            .then(artists => addSpotifyLinksToArtistNames(artists))
+            .catch((error) => {
+                console.log("Error occurred on retry of fetching artists: " + error);
+            });
+        }, 1000);
+    });
+}
 
 function addSpotifyLinksToArtistNames(artists) {
     const artistNameElement = document.getElementById('artist-name-text');
