@@ -82,6 +82,17 @@ button:hover {
     padding: 3vh 0vw;
 }
 
+#recommendations-button {
+    border-radius: 15px;
+}
+
+@media (min-width: 600px) {
+    #recommendations-button {
+        font-size: 20px;
+        padding: 10px 20px;
+    }
+}
+
 #cover-art-container {
     display: flex;
     justify-content: center;
