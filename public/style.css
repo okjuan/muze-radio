@@ -66,12 +66,33 @@ button:hover {
     position: relative;
     display: flex;
     justify-content: center;
+}
+
+.music-library-controls {
     margin: 15px 0 0 0;
 }
 
-.music-controls button, .music-library-controls button {
+.music-control-button {
     margin: 0 5px;
     padding: 5px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@media (min-width: 600px) {
+    .music-control-button {
+        width: 35px;
+        height: 35px;
+    }
+}
+
+@media (max-width: 599px) {
+    .music-control-button {
+        width: 30px;
+        height: 30px;
+    }
 }
 
 #spotify-logo {
