@@ -63,6 +63,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     console.log('Ready with Device ID', device_id);
     resolveDeviceId(device_id);
     transferPlayback(device_id).then(() => {
+        enablePlayerButtons();
         console.log("Pre-fetching user's playlists...");
         getUserPlaylists().then(() => console.log("Done fetching user's playlists!"));
     });
@@ -113,7 +114,6 @@ window.onSpotifyWebPlaybackSDKReady = () => {
         currentPlayingUpdated = true;
     }
     if (currentPlayingUpdated) {
-        document.getElementById('currently-playing').style.display = 'flex';
         isSavedToLikedSongs(CURRENTLY_PLAYING.spotifyId).then(response => {
             document.getElementById('like-button-icon').className = `${response[0]? 'fa-solid fa-heart' : 'fa-regular fa-heart'}`
         });
@@ -140,31 +140,23 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     });
     this.disabled = false;
   };
-  generateRecommendationsButton.disabled = false;
 
   const playPauseButton = document.getElementById('play-pause-button');
-  playPauseButton.disabled = true;
   playPauseButton.onclick = function() {
     player.togglePlay();
   };
-  playPauseButton.disabled = false;
 
   const skipButton = document.getElementById('next-button');
-  skipButton.disabled = true;
   skipButton.onclick = function() {
       player.nextTrack();
   };
-  skipButton.disabled = false;
 
   const previousButton = document.getElementById('previous-button');
-  previousButton.disabled = true;
   previousButton.onclick = function() {
       player.previousTrack();
   };
-  previousButton.disabled = false;
 
   const likeButton = document.getElementById('like-button');
-  likeButton.disabled = true;
   likeButton.onclick = function(event) {
     const likeButtonIcon = event.target.id === "like-button-icon" ? event.target : event.target.querySelector('i');
     likeButtonIcon.className = "fa-solid fa-spinner fa-spin";
@@ -187,10 +179,8 @@ window.onSpotifyWebPlaybackSDKReady = () => {
         showMessageToUser("Sorry, that didn't work. Please try again later.");
     });
   };
-  likeButton.disabled = false;
 
   const plusButton = document.getElementById('add-button');
-  plusButton.disabled = true;
   plusButton.onclick = function() {
         const addIcon = document.getElementById('add-button-icon');
         addIcon.className = "fa-solid fa-spinner fa-spin";
@@ -201,8 +191,16 @@ window.onSpotifyWebPlaybackSDKReady = () => {
             addIcon.className = "fa-solid fa-plus";
         });
     };
-  plusButton.disabled = false;
 };
+
+function enablePlayerButtons() {
+    document.getElementById('recommendations-button').disabled = false;
+    document.getElementById('play-pause-button').disabled = false;
+    document.getElementById('next-button').disabled = false;
+    document.getElementById('previous-button').disabled = false;
+    document.getElementById('like-button').disabled = false;
+    document.getElementById('add-button').disabled = false;
+}
 
 function updateCurrentlyPlayingArtists(current_track) {
     CURRENTLY_PLAYING.artistUris = current_track['artists'].map(a => a.uri);

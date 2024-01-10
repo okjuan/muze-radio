@@ -127,6 +127,13 @@ button:hover {
     height: var(--currently-playing-right-block-height);
 }
 
+img#cover-art[src=""] {
+    width: 0;
+    height: 0;
+    padding: calc(var(--currently-playing-right-block-height) / 2) calc(var(--currently-playing-right-block-width) / 2);
+    background-color: #c4c4c4;
+}
+
 #currently-playing-right {
     width: var(--currently-playing-right-block-width);
     height: var(--currently-playing-right-block-height);
