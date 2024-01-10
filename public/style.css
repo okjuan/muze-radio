@@ -115,7 +115,7 @@ button:hover {
     }
 }
 
-#cover-art-container {
+#currently-playing-left {
     display: flex;
     justify-content: center;
     align-items: center;
