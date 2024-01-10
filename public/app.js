@@ -248,6 +248,7 @@ function updateCurrentlyPlayingAlbum(current_track) {
     CURRENTLY_PLAYING.coverArtUrl = current_track['album']['images'][0]['url'];
     const coverArtImg = document.getElementById('cover-art')
     coverArtImg.src = CURRENTLY_PLAYING.coverArtUrl;
+    coverArtImg.alt = `Cover art for ${CURRENTLY_PLAYING.albumName}`;
 
     const albumId = getIdFromUri(current_track['album']['uri']);
     getAlbum(albumId).then(album => {
