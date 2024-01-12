@@ -49,3 +49,9 @@ export function wrapPromiseWithStatus(promise) {
     );
     return wrappingPromise;
 }
+
+export function calculatePercentage(value, minValue, maxValue) {
+    const range = Math.abs(maxValue - minValue);
+    const relativeValue = value - minValue;
+    return (relativeValue / range) * 100;
+}

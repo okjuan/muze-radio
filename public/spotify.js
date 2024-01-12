@@ -166,6 +166,24 @@ function requestRecommendations(token, queryParams) {
     .catch(error => console.error('Error:', error));
 }
 
+export function getSpotifyAudioFeatures(songIds) {
+    return getUserAuth([]).then(authToken =>
+        fetch(`https://api.spotify.com/v1/audio-features?ids=${songIds.join(',')}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + authToken
+            }
+        })
+    )
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        return data.audio_features;
+    });
+}
+
 function getCurrentUserId() {
     if (userId) {
         return Promise.resolve(userId);

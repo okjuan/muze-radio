@@ -4,6 +4,7 @@ import {
     getArtists,
     getIdFromUri,
     getSong,
+    getSpotifyAudioFeatures,
     getRecommendations,
     getUserAuth,
     getUserPlaylists,
@@ -15,7 +16,7 @@ import {
     spotifySeedGenres,
     transferPlayback
 } from './spotify.js';
-import { arraysAreEqual, shuffleArray } from './utils.js';
+import { arraysAreEqual, calculatePercentage, shuffleArray } from './utils.js';
 
 var USER_MESSAGE_TIMEOUT_MS = 3000;
 var CURRENTLY_PLAYING = {
@@ -117,6 +118,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
         isSavedToLikedSongs(CURRENTLY_PLAYING.spotifyId).then(response => {
             document.getElementById('like-button-icon').className = `${response[0]? 'fa-solid fa-heart' : 'fa-regular fa-heart'}`
         });
+        updateCurrentlyPlayingAudioFeatures(current_track);
     }
   });
 
@@ -127,7 +129,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   generateRecommendationsButton.onclick = function() {
     document.getElementById('recommendations-button-icon').className = "fa-solid fa-spinner fa-spin";
     this.disabled = true;
-    const audioFeatures = getSpotifyAudioFeatures();
+    const audioFeatures = getSpotifyAudioFeatureRanges();
     console.log('audioFeatures', audioFeatures);
     const genres = getSeedGenres(maxSeedGenres);
     console.log('genres', genres);
@@ -235,6 +237,7 @@ function updateCurrentlyPlayingSong(current_track) {
         songNameElement.onclick = () => {
             window.open(song.external_urls.spotify, '_blank');
         };
+        updateCurrentlyPlayingSliderInputIcon('popularity', song.popularity);
     });
 }
 
@@ -273,6 +276,29 @@ function addSpotifyLinksToArtistNames(artists) {
         artistNameElement.appendChild(artistName);
         delimiter = ", ";
     });
+}
+
+function updateCurrentlyPlayingAudioFeatures(current_track) {
+    getSpotifyAudioFeatures([current_track.id]).then((audioFeatures) => {
+        if (audioFeatures.length < 1) {
+            console.error("No audio features found for track " + current_track.id);
+            return;
+        }
+        Object.entries(audioFeatures[0]).forEach(([audioFeature, value]) =>
+            updateCurrentlyPlayingSliderInputIcon(audioFeature, value)
+        );
+    });
+}
+
+function updateCurrentlyPlayingSliderInputIcon(inputName, value) {
+    const inputElement = document.getElementById(`${inputName}-input`);
+    if (inputElement === null) {
+        console.debug(`No input found for '${inputName}'`);
+        return;
+    }
+    const valuePercentage = calculatePercentage(value, inputElement.min, inputElement.max);
+    console.debug(`${inputName}: val=${value}, max=${inputElement.max}, min=${inputElement.min} percent=${valuePercentage}`);
+    document.getElementById(`${inputName}-currently-playing-icon`).style.left = `${valuePercentage}%`;
 }
 
 function showMessageToUser(message) {
@@ -379,7 +405,7 @@ spotifySeedGenres.forEach((genre, index) => {
     }
 });
 
-function getSpotifyAudioFeatures() {
+function getSpotifyAudioFeatureRanges() {
     var sliders = document.getElementsByClassName('slider');
     var sliderValues = Array.from(sliders).map(slider => ({ [slider.name]: slider.value }));
     return Object.assign({}, ...sliderValues);

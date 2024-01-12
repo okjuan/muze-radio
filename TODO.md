@@ -7,8 +7,6 @@ high pri:
 feature work: sliders
 - [ ] replace sliders with sliders with two controls that allow setting a range
     - this will probably require a bit of work; see [this StackOverflow Q](https://stackoverflow.com/q/4753946)
-- [ ] indicate audio feature value for currently playing song with a blinking/pulsating sound icon that appears on the sliders
-    - e.g. Font Awesome's `volume-high` icon with `beat` animation: `<i class="fa-solid fa-volume-high fa-beat"></i>`
 
 ---
 
