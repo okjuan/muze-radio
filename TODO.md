@@ -11,10 +11,12 @@ feature work: sliders
 ---
 
 backlog:
-- [ ] implement Spotify's branding requirements and request extended quota
+- [ ] [craft] vertically center checkboxes next to each slider label
+- [ ] [optimization] fetch audio features of all recommended songs at the same time and save them for use when they are played
+- [ ] [craft] disable (or debounce?) player control buttons after one is clicked, until corresponding operation (e.g. skip) completes
 - [ ] remove token from local storage if it's expired or absent or bad
-- [ ] optimization: parallelize requests to fetch all user's playlists
-- [ ] optimization: check for OPTIONS requests and remove them as (e.g. `application/json` request(?) types cause them)
+- [ ] [optimization] parallelize requests to fetch all user's playlists
+- [ ] [optimization] check for OPTIONS requests and remove them as (e.g. `application/json` request(?) types cause them)
 - [ ] support multiple cached access tokens at once with different scopes
 - [ ] code style: use `.property` access notation everywhere rather than `['property']` notation
 - [ ] fix layout which got messed up by my adding heart and plus buttons, which leak out of `currently-playing-right` div
