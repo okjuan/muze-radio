@@ -56,7 +56,7 @@ function requestToken(spotifyScopes) {
     window.history.replaceState({}, document.title, window.location.pathname);
 
     // Step 4: Exchange the authorization code for an access token
-    return fetch('https://accounts.spotify.com/api/token', {
+    return fetchWithRetry('https://accounts.spotify.com/api/token', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -94,7 +94,7 @@ function shouldRenewToken(userAuthData) {
 }
 
 function refreshAccessToken(userAuthData) {
-    return fetch('https://accounts.spotify.com/api/token', {
+    return fetchWithRetry('https://accounts.spotify.com/api/token', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -132,7 +132,7 @@ export function addSongsToPlaylist(playlistId, songUris, position=undefined) {
     for (const songUriBatch of songUriBatches) {
         const queryParams = `uris=${songUriBatch.join(',')}` + (position !== undefined? `&position=${position + songsAdded}` : '');
         const request = getUserAuth(authScopes).then(authToken =>
-            fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?${queryParams}`, {
+            fetchWithRetry(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?${queryParams}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -156,7 +156,7 @@ export function getRecommendations(audioFeatures, genres) {
 function requestRecommendations(token, queryParams) {
     // e.g. target_popularity=100&target_energy=80&target_acousticness=80&target_loudness=50&target_instrumentalness=100
     console.log('queryParams', queryParams);
-    return fetch(`https://api.spotify.com/v1/recommendations?${queryParams}`, {
+    return fetchWithRetry(`https://api.spotify.com/v1/recommendations?${queryParams}`, {
         method: 'GET',
         headers: {
             'Authorization': 'Bearer ' + token
@@ -168,7 +168,7 @@ function requestRecommendations(token, queryParams) {
 
 export function getSpotifyAudioFeatures(songIds) {
     return getUserAuth([]).then(authToken =>
-        fetch(`https://api.spotify.com/v1/audio-features?ids=${songIds.join(',')}`, {
+        fetchWithRetry(`https://api.spotify.com/v1/audio-features?ids=${songIds.join(',')}`, {
             method: 'GET',
             headers: {
                 'Authorization': 'Bearer ' + authToken
@@ -181,7 +181,30 @@ export function getSpotifyAudioFeatures(songIds) {
             throw new Error(data.error);
         }
         return data.audio_features;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        return [];
     });
+}
+
+function fetchWithRetry(url, options, retries = 3, backoffSeconds = 0.3) {
+    return fetch(url, options)
+        .then(res => {
+            if (res.status === 429 && retries > 0) {
+                const retryAfter = res.headers.get('Retry-After') || backoffSeconds;
+                return new Promise(resolve => setTimeout(resolve, retryAfter * 1000))
+                    .then(() => fetchWithRetry(url, options, retries - 1, backoffSeconds * 2));
+            }
+            return res;
+        })
+        .catch(error => {
+            if (retries > 0) {
+                return new Promise(resolve => setTimeout(resolve, backoffSeconds))
+                    .then(() => fetchWithRetry(url, options, retries - 1, backoffSeconds * 2));
+            }
+            throw error;
+        });
 }
 
 function getCurrentUserId() {
@@ -189,7 +212,7 @@ function getCurrentUserId() {
         return Promise.resolve(userId);
     }
     return getUserAuth(['user-read-private']).then((authToken) =>
-        fetch('https://api.spotify.com/v1/me', {
+        fetchWithRetry('https://api.spotify.com/v1/me', {
             headers: {
                 'Authorization': 'Bearer ' + authToken
             }
@@ -202,7 +225,7 @@ function getCurrentUserId() {
 
 export function isSavedToLikedSongs(spotifyId) {
     return getUserAuth(['user-library-read']).then((authToken) =>
-        fetch(`https://api.spotify.com/v1/me/tracks/contains?ids=${spotifyId}`, {
+        fetchWithRetry(`https://api.spotify.com/v1/me/tracks/contains?ids=${spotifyId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -218,7 +241,7 @@ export function isSavedToLikedSongs(spotifyId) {
 
 export function removeFromLikedSongs(spotifyId) {
     return getUserAuth(['user-library-read']).then(authToken =>
-        fetch(`https://api.spotify.com/v1/me/tracks?ids=${spotifyId}`, {
+        fetchWithRetry(`https://api.spotify.com/v1/me/tracks?ids=${spotifyId}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -230,7 +253,7 @@ export function removeFromLikedSongs(spotifyId) {
 
 export function saveToLikedSongs(spotifyId) {
     return getUserAuth(['user-library-read']).then(authToken =>
-        fetch(`https://api.spotify.com/v1/me/tracks`, {
+        fetchWithRetry(`https://api.spotify.com/v1/me/tracks`, {
             method: 'PUT',
             body: JSON.stringify({ ids: [spotifyId]}),
             headers: {
@@ -243,7 +266,7 @@ export function saveToLikedSongs(spotifyId) {
 
 export function transferPlayback(device_id) {
     return getUserAuth(['user-modify-playback-state']).then((authToken) =>
-        fetch(`https://api.spotify.com/v1/me/player`, {
+        fetchWithRetry(`https://api.spotify.com/v1/me/player`, {
             method: 'PUT',
             body: JSON.stringify({ device_ids: [device_id], play: true}),
             headers: {
@@ -256,7 +279,7 @@ export function transferPlayback(device_id) {
 
 export function playSongs(device_id, spotify_uris) {
     getUserAuth(['user-modify-playback-state']).then(authToken =>
-        fetch(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
+        fetchWithRetry(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
             method: 'PUT',
             body: JSON.stringify({ uris: spotify_uris }),
             headers: {
@@ -281,7 +304,7 @@ export function getUserPlaylists() {
 
 export function getUserPlaylistsRecursively(offset, limit) {
     return getUserAuth(['playlist-read-private']).then(authToken =>
-        fetch(`https://api.spotify.com/v1/me/playlists?limit=${limit}&offset=${offset}`, {
+        fetchWithRetry(`https://api.spotify.com/v1/me/playlists?limit=${limit}&offset=${offset}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -302,7 +325,7 @@ export function getUserPlaylistsRecursively(offset, limit) {
 
 export function getAlbum(albumId) {
     return getUserAuth([]).then(authToken =>
-        fetch(`https://api.spotify.com/v1/albums/${albumId}`, {
+        fetchWithRetry(`https://api.spotify.com/v1/albums/${albumId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -315,7 +338,7 @@ export function getAlbum(albumId) {
 
 export function getSong(songId) {
     return getUserAuth([]).then(authToken =>
-        fetch(`https://api.spotify.com/v1/tracks/${songId}`, {
+        fetchWithRetry(`https://api.spotify.com/v1/tracks/${songId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -328,7 +351,7 @@ export function getSong(songId) {
 
 export function getArtists(artistIds) {
     return getUserAuth([]).then(authToken =>
-        fetch(`https://api.spotify.com/v1/artists?ids=${artistIds.join(',')}`, {
+        fetchWithRetry(`https://api.spotify.com/v1/artists?ids=${artistIds.join(',')}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
