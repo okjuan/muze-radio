@@ -146,6 +146,10 @@ img#cover-art[src=""] {
     margin: 0 10px 0 10px;
 }
 
+.slider {
+    margin-bottom: 20px;
+}
+
 .slider:hover {
     cursor: pointer;
 }
@@ -189,13 +193,18 @@ img#cover-art[src=""] {
     width: 100%;
 }
 
-.slider-label {
-    margin-top: 20px;
+.slider-label-container {
     width: auto;
     height: 25px;
-    text-align: center;
     display: flex;
-    flex-direction: column;
+    align-items:center;
+    text-align: center;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.slider-checkbox {
+    margin-right: 10px;
 }
 
 .pills-container {

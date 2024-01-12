@@ -405,9 +405,20 @@ spotifySeedGenres.forEach((genre, index) => {
     }
 });
 
+document.querySelectorAll('.slider-label-container').forEach((sliderLabelContainer, index) => {
+    sliderLabelContainer.addEventListener('click', () => {
+        const checkbox = sliderLabelContainer.querySelector('.slider-checkbox');
+        const slider = document.querySelectorAll('.slider')[index];
+        checkbox.className = 'slider-checkbox ' + (slider.disabled? 'fa-solid fa-square-check' : 'fa-regular fa-square');
+        slider.disabled = !slider.disabled;
+    });
+});
+
 function getSpotifyAudioFeatureRanges() {
     var sliders = document.getElementsByClassName('slider');
-    var sliderValues = Array.from(sliders).map(slider => ({ [slider.name]: slider.value }));
+    var sliderValues = Array.from(sliders)
+        .filter((slider) => !slider.disabled)
+        .map(slider => ({ [slider.name]: slider.value }));
     return Object.assign({}, ...sliderValues);
 }
 
