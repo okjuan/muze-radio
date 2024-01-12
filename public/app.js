@@ -242,6 +242,7 @@ function updateCurrentlyPlayingSong(current_track) {
 }
 
 function updateCurrentlyPlayingAlbum(current_track) {
+    CURRENTLY_PLAYING.albumUri = current_track['album']['uri'];
     CURRENTLY_PLAYING.albumName = current_track['album']['name'];
     const albumNameElement = document.getElementById('album-name-text');
     albumNameElement.textContent = ` ${CURRENTLY_PLAYING.albumName}`;
@@ -251,7 +252,7 @@ function updateCurrentlyPlayingAlbum(current_track) {
     coverArtImg.src = CURRENTLY_PLAYING.coverArtUrl;
     coverArtImg.alt = `Cover art for ${CURRENTLY_PLAYING.albumName}`;
 
-    const albumId = getIdFromUri(current_track['album']['uri']);
+    const albumId = getIdFromUri(CURRENTLY_PLAYING.albumUri);
     getAlbum(albumId).then(album => {
         CURRENTLY_PLAYING.album = album;
         coverArtImg.className += " clickable";
