@@ -30,9 +30,17 @@ export function getUserAuth(spotifyScopes) {
         return request;
     }
     if (shouldRenewToken(userAuthData)) {
-        const request = refreshAccessToken(userAuthData);
-        userAuthDataPromise = wrapPromiseWithStatus(request);
-        return request;
+        const refreshRequest = refreshAccessToken(userAuthData);
+        userAuthDataPromise = wrapPromiseWithStatus(refreshRequest);
+        return refreshRequest.then(token => {
+            if (token) {
+                return token;
+            }
+            clearAuthCache();
+            const authRequest = requestToken(spotifyScopes);
+            userAuthDataPromise = wrapPromiseWithStatus(authRequest);
+            return authRequest;
+        });
     }
     return Promise.resolve(userAuthData['access_token']);
 }
@@ -45,7 +53,7 @@ function requestToken(spotifyScopes) {
 
         sha256(codeVerifier).then((hash) => {
             // Step 2: Redirect the user to the authorization endpoint
-            let authUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(spotifyScopes.join(' '))}&code_challenge=${base64encode(hash)}&code_challenge_method=S256`;
+            let authUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}${spotifyScopes.length > 0 ? `&scope=${encodeURIComponent(spotifyScopes.join(' '))}` : ''}&code_challenge=${base64encode(hash)}&code_challenge_method=S256`;
             window.location.href = authUrl;
         });
         return Promise.resolve(undefined);
@@ -108,13 +116,23 @@ function refreshAccessToken(userAuthData) {
     .then(response => response.json())
     .then(data => {
         if (data.error) {
-            throw new Error(data.error);
+            if (data.error === 'invalid_grant') {
+                return undefined;
+            } else {
+                throw new Error(data.error);
+            }
         } else {
             console.log("Refreshed token", data);
             cacheUserAuthData(data);
             return data;
         }
     });
+}
+
+function clearAuthCache() {
+    localStorage.removeItem(userAuthDataKey);
+    localStorage.removeItem('code_verifier');
+    userAuthDataPromise = undefined;
 }
 
 function cacheUserAuthData(userAuthData) {
