@@ -238,6 +238,9 @@ function updateCurrentlyPlayingSong(current_track) {
             window.open(song.external_urls.spotify, '_blank');
         };
         updateCurrentlyPlayingSliderInputIcon('popularity', song.popularity);
+    }).catch((error) => {
+        console.error("Error occurred when fetching song: " + error);
+        document.querySelectorAll('.song-metadata-icon-currently-playing').forEach(icon => icon.style.display = 'none');
     });
 }
 
@@ -283,6 +286,7 @@ function updateCurrentlyPlayingAudioFeatures(current_track) {
     getSpotifyAudioFeatures([current_track.id]).then((audioFeatures) => {
         if (audioFeatures.length < 1) {
             console.error("No audio features found for track " + current_track.id);
+            document.querySelectorAll('.audio-feature-icon-currently-playing').forEach(icon => icon.style.display = 'none');
             return;
         }
         Object.entries(audioFeatures[0]).forEach(([audioFeature, value]) =>
@@ -299,7 +303,9 @@ function updateCurrentlyPlayingSliderInputIcon(inputName, value) {
     }
     const valuePercentage = calculatePercentage(value, inputElement.min, inputElement.max);
     console.debug(`${inputName}: val=${value}, max=${inputElement.max}, min=${inputElement.min} percent=${valuePercentage}`);
-    document.getElementById(`${inputName}-currently-playing-icon`).style.left = `${valuePercentage}%`;
+    const iconElement = document.getElementById(`${inputName}-currently-playing-icon`);
+    iconElement.style.left = `${valuePercentage}%`;
+    iconElement.style.display = 'inline';
 }
 
 function showMessageToUser(message) {
