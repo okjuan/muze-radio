@@ -118,7 +118,8 @@ window.onSpotifyWebPlaybackSDKReady = () => {
         isSavedToLikedSongs(CURRENTLY_PLAYING.spotifyId).then(response => {
             document.getElementById('like-button-icon').className = `${response[0]? 'fa-solid fa-heart' : 'fa-regular fa-heart'}`
         });
-        updateCurrentlyPlayingAudioFeatures(current_track);
+        // Temporarily skipping this step because my app is consitently getting 429 errors for this request
+        //updateCurrentlyPlayingAudioFeatures(current_track);
     }
   });
 
