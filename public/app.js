@@ -88,7 +88,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
 
   player.addListener('player_state_changed', (args) => {
     if (args === null || args === undefined) {
-        console.log('player_state_changed event triggered but args is null or undefined -- returning early from handler');
+        console.debug('player_state_changed event triggered but args is null or undefined -- returning early from handler');
         return;
     }
     const { paused, track_window: { current_track } } = args;
@@ -130,11 +130,11 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     document.getElementById('recommendations-button-icon').className = "fa-solid fa-spinner fa-spin";
     this.disabled = true;
     const audioFeatures = getSpotifyAudioFeatureRanges();
-    console.log('audioFeatures', audioFeatures);
+    console.debug('audioFeatures', audioFeatures);
     const genres = getSeedGenres(maxSeedGenres);
-    console.log('genres', genres);
+    console.debug('genres', genres);
     getRecommendations(audioFeatures, genres).then(recommendations => {
-        console.log('recommendations', recommendations);
+        console.debug('recommendations', recommendations);
         player.getDeviceId.then(device_id => {
             playSongs(device_id, shuffleArray(recommendations['tracks'].map(track => track.uri)));
             document.getElementById('recommendations-button-icon').className = "fa-solid fa-magnifying-glass";
@@ -176,7 +176,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
             });
         }
     }).catch((error) => {
-        console.log("Error occurred when handling button click on like button:" + error);
+        console.error("Error occurred when handling button click on like button:" + error);
         likeButtonIcon.className = "fa-regular fa-heart";
         showMessageToUser("Sorry, that didn't work. Please try again later.");
     });
@@ -215,12 +215,12 @@ function updateCurrentlyPlayingArtists(current_track) {
     getArtists(artistIds)
     .then(artists => addSpotifyLinksToArtistNames(artists))
     .catch((error) => {
-        console.log("Retrying getArtists() since it failed the first time: " + error);
+        console.debug("Retrying getArtists() since it failed the first time: " + error);
         setTimeout(() => {
             getArtists(artistIds)
             .then(artists => addSpotifyLinksToArtistNames(artists))
             .catch((error) => {
-                console.log("Error occurred on retry of fetching artists: " + error);
+                console.error("Error occurred on retry of fetching artists: " + error);
             });
         }, 1000);
     });
