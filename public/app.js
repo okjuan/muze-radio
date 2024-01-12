@@ -360,13 +360,14 @@ function showPlaylistPicker(playlists) {
 }
 
 const genresContainer = document.querySelector('.pills-container');
-spotifySeedGenres.forEach(genre => {
+spotifySeedGenres.forEach((genre, index) => {
     if (!genresContainer.querySelector(`input[value="${genre}"]`)) {
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.id = genre;
         checkbox.className = 'genre';
         checkbox.value = genre;
+        checkbox.checked = index === 0;
 
         const label = document.createElement('label');
         label.htmlFor = genre;
