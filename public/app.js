@@ -426,7 +426,18 @@ function getSpotifyAudioFeatureRanges() {
     var sliders = document.getElementsByClassName('slider');
     var sliderValues = Array.from(sliders)
         .filter((slider) => !slider.disabled)
-        .map(slider => ({ [slider.name]: slider.value }));
+        .map(slider => {
+            const value = Number(slider.value);
+            const step = Number(slider.step);
+            const min = Number(slider.min);
+            const max = Number(slider.max);
+            return {
+                [slider.name]: {
+                    minValue: Math.max(value - (step), min),
+                    maxValue: Math.min(value + (step), max),
+                }
+            };
+        });
     return Object.assign({}, ...sliderValues);
 }
 
