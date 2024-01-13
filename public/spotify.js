@@ -18,6 +18,7 @@ const userAuthDataKey = "userAuthData";
 const expiryBufferInSeconds = 5;
 const redirectUri = 'https://okjuan.me/muze-radio';
 let userAuthDataPromise = undefined;
+const MARKET = 'US';
 
 export function getUserAuth(spotifyScopes) {
     var userAuthData = JSON.parse(localStorage.getItem(userAuthDataKey));
@@ -164,7 +165,7 @@ export function addSongsToPlaylist(playlistId, songUris, position=undefined) {
 }
 
 export function getRecommendations(audioFeatures, genres) {
-    var queryParams = `seed_genres=${genres.join(',')}&limit=100&`
+    var queryParams = `seed_genres=${genres.join(',')}&limit=100&market=${MARKET}&`
     queryParams += Object.entries(audioFeatures)
         .map(([key, value]) => `target_${key}=${value}`)
         .join('&');
@@ -343,7 +344,7 @@ export function getUserPlaylistsRecursively(offset, limit) {
 
 export function getAlbum(albumId) {
     return getUserAuth([]).then(authToken =>
-        fetchWithRetry(`https://api.spotify.com/v1/albums/${albumId}`, {
+        fetchWithRetry(`https://api.spotify.com/v1/albums/${albumId}?market=${MARKET}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -356,7 +357,7 @@ export function getAlbum(albumId) {
 
 export function getSong(songId) {
     return getUserAuth([]).then(authToken =>
-        fetchWithRetry(`https://api.spotify.com/v1/tracks/${songId}`, {
+        fetchWithRetry(`https://api.spotify.com/v1/tracks/${songId}?market=${MARKET}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
