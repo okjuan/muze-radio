@@ -166,9 +166,9 @@ export function addSongsToPlaylist(playlistId, songUris, position=undefined) {
 }
 
 export function getRecommendations(audioFeatures, genres) {
-    var queryParams = `seed_genres=${genres.join(',')}&limit=${maxSongsPerGetRecommendationsRequest}&market=${MARKET}&`
+    var queryParams = `seed_genres=${genres.join(',')}&limit=${maxSongsPerGetRecommendationsRequest}&market=${MARKET}`
     queryParams += Object.entries(audioFeatures)
-        .map(([audioFeature, parameters]) => `${parameters.targetValue? `target_${audioFeature}=${parameters.targetValue}&` : ''}min_${audioFeature}=${parameters.minValue}&max_${audioFeature}=${parameters.maxValue}`)
+        .map(([audioFeature, parameters]) => `&${parameters.targetValue? `target_${audioFeature}=${parameters.targetValue}&` : ''}min_${audioFeature}=${parameters.minValue}&max_${audioFeature}=${parameters.maxValue}`)
         .join('&');
     return getUserAuth([]).then(token => requestRecommendations(token, queryParams));
 }
