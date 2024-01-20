@@ -17,6 +17,7 @@ import {
     transferPlayback
 } from './spotify.js';
 import { arraysAreEqual, calculatePercentage, shuffleArray } from './utils.js';
+import { isFirstTimeUser } from './cache.js';
 
 var USER_MESSAGE_TIMEOUT_MS = 3000;
 var CURRENTLY_PLAYING = {
@@ -67,7 +68,9 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     transferPlayback(device_id).then(() => {
         enablePlayerButtons();
         setTimeout(() => {
-            HAS_USER_CLICKED_FIND_MUSIC || showMessageToUser("Click 'Find Music' to start exploring!");
+            if (!HAS_USER_CLICKED_FIND_MUSIC && isFirstTimeUser()) {
+                showMessageToUser("Click 'Find Music' to start exploring!");
+            }
         }, 5000);
         console.log("Pre-fetching user's playlists...");
         getUserPlaylists().then(() => console.log("Done fetching user's playlists!"));
