@@ -285,19 +285,27 @@ function updateCurrentlyPlayingAlbum(current_track) {
 }
 
 function addSpotifyLinksToArtistNames(artists) {
-    const artistNameElement = document.getElementById('artist-name-text');
-    artistNameElement.textContent = "";
     var delimiter = " ";
-    artists.artists.forEach(artist => {
-        const artistName = document.createElement('span');
-        artistName.textContent = `${delimiter}${artist.name}`;
-        artistName.className += " clickable";
-        artistName.onclick = () => {
-            window.open(artist.external_urls.spotify, '_blank');
-        };
-        artistNameElement.appendChild(artistName);
-        delimiter = ", ";
-    });
+    const artistsWithLinks = artists.artists
+        .filter(artist => artist !== null && artist !== undefined)
+        .map(artist => {
+            const artistName = document.createElement('span');
+            artistName.textContent = `${delimiter}${artist.name}`;
+            artistName.className += " clickable";
+            artistName.onclick = () => {
+                window.open(artist.external_urls.spotify, '_blank');
+            };
+            delimiter = ", ";
+            return artistName;
+        });
+    if (artistsWithLinks.length > 0) {
+        const artistNameElement = document.getElementById('artist-name-text');
+        artistNameElement.textContent = "";
+        // TODO: add commas between artists here instead of doing it above
+        artistNameElement.append(...artistsWithLinks);
+    } else {
+        console.debug("Couldn't add links for any artist!");
+    }
 }
 
 function updateCurrentlyPlayingAudioFeatures(current_track) {
