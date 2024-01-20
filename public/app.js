@@ -93,6 +93,9 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     }
     const { paused, track_window: { current_track } } = args;
     document.getElementById('play-pause-button-icon').className = `fas ${paused? 'fa-play' : 'fa-pause'}`;
+    if (!current_track) {
+        return;
+    }
     var currentPlayingUpdated = false;
     if (CURRENTLY_PLAYING.spotifyId != current_track['id']) {
         CURRENTLY_PLAYING.spotifyId = current_track['id'];
