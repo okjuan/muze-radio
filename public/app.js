@@ -72,6 +72,11 @@ window.onSpotifyWebPlaybackSDKReady = () => {
                 showMessageToUser("Click 'Find Music' to start exploring!");
             }
         }, 5000);
+        setTimeout(() => {
+            if (!HAS_USER_CLICKED_FIND_MUSIC) {
+                showMessageToUser("Click 'Find Music' to start exploring!");
+            }
+        }, 15000);
         console.log("Pre-fetching user's playlists...");
         getUserPlaylists().then(() => console.log("Done fetching user's playlists!"));
     });
