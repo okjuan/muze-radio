@@ -46,6 +46,7 @@ export const SPOTIFY_SCOPES = [
     'playlist-modify-private',
     'playlist-modify-public',
 ];
+var HAS_USER_CLICKED_FIND_MUSIC = false;
 
 getUserAuth(SPOTIFY_SCOPES);
 
@@ -65,6 +66,9 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     resolveDeviceId(device_id);
     transferPlayback(device_id).then(() => {
         enablePlayerButtons();
+        setTimeout(() => {
+            HAS_USER_CLICKED_FIND_MUSIC || showMessageToUser("Click 'Find Music' to start exploring!");
+        }, 5000);
         console.log("Pre-fetching user's playlists...");
         getUserPlaylists().then(() => console.log("Done fetching user's playlists!"));
     });
@@ -130,6 +134,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   const generateRecommendationsButton = document.getElementById('recommendations-button');
   generateRecommendationsButton.disabled = true;
   generateRecommendationsButton.onclick = function() {
+    HAS_USER_CLICKED_FIND_MUSIC = true;
     document.getElementById('recommendations-button-icon').className = "fa-solid fa-spinner fa-spin";
     this.disabled = true;
     const audioFeatures = getSpotifyAudioFeatureRanges();
