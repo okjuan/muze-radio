@@ -133,12 +133,14 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     console.debug('audioFeatures', audioFeatures);
     const genres = getSeedGenres(maxSeedGenres);
     console.debug('genres', genres);
-    getRecommendations(audioFeatures, genres).then(recommendations => {
+    requestRecommendationsUntilFound(audioFeatures, genres).then(recommendations => {
         console.debug('recommendations', recommendations);
-        player.getDeviceId.then(device_id => {
-            playSongs(device_id, shuffleArray(recommendations['tracks'].map(track => track.uri)));
-            document.getElementById('recommendations-button-icon').className = "fa-solid fa-magnifying-glass";
-        });
+        if (recommendations.tracks.length > 0) {
+            player.getDeviceId.then(device_id => {
+                playSongs(device_id, shuffleArray(recommendations['tracks'].map(track => track.uri)));
+                document.getElementById('recommendations-button-icon').className = "fa-solid fa-magnifying-glass";
+            });
+        }
     });
     this.disabled = false;
   };
@@ -392,6 +394,35 @@ function showPlaylistPicker(playlists) {
     PLAYLIST_PICKER_SHOWING = true;
 }
 
+function requestRecommendationsUntilFound(audioFeatures, genres) {
+    return getRecommendations(audioFeatures, genres).then(recommendations => {
+        if (recommendations.tracks.length === 0) {
+            var atLeastOneAudioFeatureLoosened = false;
+            const loosenedAudioFeatures = Object.assign({}, ...Object.entries(audioFeatures).map(([audioFeature, parameters]) => {
+                if (parameters.minValue > parameters.lowerBound || parameters.maxValue < parameters.upperBound) {
+                    atLeastOneAudioFeatureLoosened = true;
+                }
+                return {
+                    [audioFeature]: {
+                        minValue: Math.max(parameters.minValue - (parameters.step), parameters.lowerBound),
+                        maxValue: Math.min(parameters.maxValue + (parameters.step), parameters.upperBound),
+                        step: parameters.step,
+                        lowerBound: parameters.lowerBound,
+                        upperBound: parameters.upperBound,
+                    }
+                };
+            }));
+            if (!atLeastOneAudioFeatureLoosened) {
+                showMessageToUser("Sorry, no Spotify recommendations are available for your contraints. Please try again with different constraints.");
+                return { recommendations: { tracks: [] } };
+            }
+            return requestRecommendationsUntilFound(loosenedAudioFeatures, genres);
+        }
+        showMessageToUser(`Found ${recommendations.tracks.length} recommendations!`);
+        return recommendations;
+    });
+}
+
 const genresContainer = document.querySelector('.pills-container');
 spotifySeedGenres.forEach((genre, index) => {
     if (!genresContainer.querySelector(`input[value="${genre}"]`)) {
@@ -434,6 +465,9 @@ function getSpotifyAudioFeatureRanges() {
                 [slider.name]: {
                     minValue: Math.max(value - (step), min),
                     maxValue: Math.min(value + (step), max),
+                    step: step,
+                    upperBound: max,
+                    lowerBound: min,
                 }
             };
         });
