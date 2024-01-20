@@ -289,7 +289,7 @@ function addSpotifyLinksToArtistNames(artists) {
 
 function updateCurrentlyPlayingAudioFeatures(current_track) {
     getSpotifyAudioFeatures([current_track.id]).then((audioFeatures) => {
-        if (audioFeatures.length < 1) {
+        if (audioFeatures.length < 1 || !audioFeatures[0]) {
             console.error("No audio features found for track " + current_track.id);
             document.querySelectorAll('.audio-feature-icon-currently-playing').forEach(icon => icon.style.display = 'none');
             return;
