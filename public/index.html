@@ -13,9 +13,14 @@
 </head>
 <body>
     <div id="message-to-user"></div>
-    <img id="spotify-logo" src="images/Spotify_Logo_RGB_Black.png" alt="Spotify Logo">
+    <div id="spotify-logo-container">
+        <img id="spotify-logo" src="images/Spotify_Logo_RGB_Black.png" alt="Spotify Logo">
+    </div>
     <div id="currently-playing">
-        <div id="currently-playing-left">
+        <div id="spotify-icon-container">
+            <img id="spotify-icon" src="images/Spotify_Icon_RGB_Green.png" alt="Spotify Icon">
+        </div>
+        <div id="coverArt-container">
             <img id="cover-art" src="" alt="" />
         </div>
         <div id="currently-playing-right">
@@ -24,23 +29,28 @@
                 <p id="artist-name"><i class="fas fa-user"></i><span id="artist-name-text"></span></p>
                 <p id="album-name"><i class="fas fa-compact-disc"></i><span id="album-name-text"></span></p>
             </div>
-            <div class="music-controls">
-                <button class="music-control-button" id="previous-button" disabled><i id="previous-button-icon" class="fas fa-backward"></i></button>
-                <button class="music-control-button" id="play-pause-button" disabled><i id="play-pause-button-icon" class="fas fa-play"></i></button>
-                <button class="music-control-button" id="next-button" disabled><i id="next-button-icon" class="fas fa-forward"></i></button>
-            </div>
-            <div class="music-library-controls">
-                <button class="music-control-button" id="like-button" disabled>
-                    <i id="like-button-icon" class="fa-regular fa-heart"></i>
-                </button>
-                <button class="music-control-button" id="add-button" disabled>
-                    <i id="add-button-icon" class="fa-solid fa-plus"></i>
-                </button>
+            <div class="all-music-controls">
+                <div class="music-controls">
+                    <button class="music-control-button" id="previous-button" disabled><i id="previous-button-icon" class="fas fa-backward"></i></button>
+                    <button class="music-control-button" id="play-pause-button" disabled><i id="play-pause-button-icon" class="fas fa-play"></i></button>
+                    <button class="music-control-button" id="next-button" disabled><i id="next-button-icon" class="fas fa-forward"></i></button>
+                </div>
+                <div class="music-library-controls">
+                    <button class="music-control-button" id="like-button" disabled>
+                        <i id="like-button-icon" class="fa-regular fa-heart"></i>
+                    </button>
+                    <button class="music-control-button" id="add-button" disabled>
+                        <i id="add-button-icon" class="fa-solid fa-plus"></i>
+                    </button>
+                </div>
                 <div id="playlist-list-container" style="display: none">
                     <div id="playlist-list"></div>
                 </div>
             </div>
-        </div>
+            <div id="song-queue-container">
+                <div id="song-queue"></div>
+            </div>
+         </div>
     </div>
     <div id="recommendations-button-container">
         <button id="recommendations-button"><i id="recommendations-button-icon" class="fa-solid fa-magnifying-glass"></i> Find Music</button>

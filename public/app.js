@@ -19,6 +19,7 @@ import { arraysAreEqual, calculatePercentage, shuffleArray } from './utils.js';
 import { isFirstTimeUser } from './cache.js';
 import { SPOTIFY_MAX_SEED_GENRES, SPOTIFY_SCOPES, USER_MESSAGE_TIMEOUT_MS } from './constants.js';
 
+var PLAYER = undefined;
 var CURRENTLY_PLAYING = {
     artistNames: undefined,
     songName: undefined,
@@ -40,10 +41,10 @@ let RESOLVE_PLAYER_DEVICE_ID = undefined;
 getUserAuth(SPOTIFY_SCOPES);
 
 window.onSpotifyWebPlaybackSDKReady = () => {
-    const player = new Spotify.Player({
+    const player = (PLAYER = new Spotify.Player({
         name: 'Muze Radio',
         getOAuthToken: cb => { cb(getUserAuth(SPOTIFY_SCOPES)); }
-    });
+    }));
 
     player.getDeviceId = new Promise((resolve) => {
         RESOLVE_PLAYER_DEVICE_ID = resolve;
@@ -100,7 +101,8 @@ const onPlayerStateChanged = (args) => {
         console.debug('player_state_changed event triggered but args is null or undefined -- returning early from handler');
         return;
     }
-    const { paused, track_window: { current_track } } = args;
+    const { paused, track_window } = args;
+    const current_track = track_window.current_track;
     document.getElementById('play-pause-button-icon').className = `fas ${paused? 'fa-play' : 'fa-pause'}`;
     if (!current_track) {
         return;
@@ -131,8 +133,67 @@ const onPlayerStateChanged = (args) => {
             document.getElementById('like-button-icon').className = `${response[0]? 'fa-solid fa-heart' : 'fa-regular fa-heart'}`
         });
         updateCurrentlyPlayingAudioFeatures(current_track);
+        updateSongQueue(track_window);
     }
 }
+
+function updateSongQueue(track_window) {
+    const tracks = Array.from([
+        ...track_window.previous_tracks,
+        track_window.current_track,
+        ...track_window.next_tracks,
+    ]);
+    const indexOfCurrentlyPlayingTrack = track_window.previous_tracks.length;
+    const trackElements = tracks.map((track, index) => {
+        const songQueueItem = document.createElement('div');
+
+        songQueueItem.onclick = getSongQueueItemClickHandler(index, indexOfCurrentlyPlayingTrack);
+        songQueueItem.className = 'song-queue-list-item';
+        songQueueItem.dataset.trackId = track.id;
+
+        const trackName = document.createElement('p');
+        trackName.id = `song-queue-list-item-${track.id}`;
+        trackName.textContent = track.name;
+
+        if (index === indexOfCurrentlyPlayingTrack) {
+            const previouslyPlayingSongQueueElement = document.getElementById('song-queue-currently-playing');
+            if (previouslyPlayingSongQueueElement) {
+                previouslyPlayingSongQueueElement.id = '';
+            }
+            songQueueItem.id = "song-queue-currently-playing";
+        }
+
+        songQueueItem.append(trackName);
+        return songQueueItem;
+    });
+    const songQueueElement = document.getElementById('song-queue');
+    songQueueElement.innerHTML = "";
+    songQueueElement.append(...trackElements);
+}
+
+const getSongQueueItemClickHandler = (targetIndex, indexOfCurrentlyPlayingTrack) => {
+    return (_) => {
+        if (!PLAYER) {
+            console.debug("Player is unexpected falsy: " + PLAYER);
+            return;
+        }
+        const offset = indexOfCurrentlyPlayingTrack - targetIndex;
+        if (offset !== 0) {
+            var skipFunction = offset > 0 ? PLAYER.previousTrack : PLAYER.nextTrack;
+            // skip to start of current track to avoid skipping to start of track when skipping backwards
+            PLAYER.seek(0).then(() =>
+                (function skipRecursively(iterationNumber, total) {
+                    skipFunction.call(PLAYER).then(() => {
+                        if (iterationNumber < total) {
+                            // stagger skips to avoid HTTP 409
+                            return setTimeout(() => skipRecursively(iterationNumber + 1, total), 500);
+                        }
+                    });
+                })(1, Math.abs(offset))
+            );
+        }
+    }
+};
 
 const setUpRecommendationsButtonListener = (player) => {
     const generateRecommendationsButton = document.getElementById('recommendations-button');
