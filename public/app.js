@@ -272,10 +272,8 @@ function updateCurrentlyPlayingAlbum(current_track) {
     const albumNameElement = document.getElementById('album-name-text');
     albumNameElement.textContent = ` ${CURRENTLY_PLAYING.albumName}`;
 
-    CURRENTLY_PLAYING.coverArtUrl = current_track['album']['images'][0]['url'];
-    const coverArtImg = document.getElementById('cover-art')
-    coverArtImg.src = CURRENTLY_PLAYING.coverArtUrl;
-    coverArtImg.alt = `Cover art for ${CURRENTLY_PLAYING.albumName}`;
+    const coverArtImg = document.getElementById('cover-art');
+    setCoverArt(coverArtImg, current_track['album']['images']);
 
     const albumId = getIdFromUri(CURRENTLY_PLAYING.albumUri);
     getAlbum(albumId).then(album => {
@@ -290,6 +288,24 @@ function updateCurrentlyPlayingAlbum(current_track) {
             window.open(album.external_urls.spotify, '_blank');
         });
     });
+}
+
+function setCoverArt(coverArtImg, coverArtImages) {
+    const coverArtSize = coverArtImg.clientWidth;
+    const bestMatchImage = coverArtImages.reduce((bestImage, image) => {
+        if (!bestImage || Math.abs(image.width - coverArtSize) < Math.abs(bestImage.width - coverArtSize)) {
+            return image;
+        }
+        return bestImage;
+    }, null);
+
+    if (bestMatchImage) {
+        CURRENTLY_PLAYING.coverArtUrl = bestMatchImage.url;
+        coverArtImg.src = CURRENTLY_PLAYING.coverArtUrl;
+        coverArtImg.alt = `Cover art for ${CURRENTLY_PLAYING.albumName}`;
+    } else {
+        console.error("No suitable image found for cover art");
+    }
 }
 
 function addSpotifyLinksToArtistNames(artists) {
