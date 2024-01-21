@@ -2,11 +2,11 @@ high pri:
 - [ ] fix styling of song metadata when song/artist/album names are long (test with Classical music)
 - [ ] support filtering/searching of playlists in modal that appears when '+' (add to playlist) button clicked
 - [ ] show songs that are in queue
-- [ ] make search button bigger and/or style it to draw more attention
 
 feature work: sliders
 - [ ] replace sliders with sliders with two controls that allow setting a range
     - this will probably require a bit of work; see [this StackOverflow Q](https://stackoverflow.com/q/4753946)
+    - see [nouislider](https://refreshless.com/nouislider/ have 2 knobs on sliders to allow custom range
 
 ---
 
@@ -24,40 +24,20 @@ backlog:
 - [ ] use Spotify's Get User's Top Items API to personalize recommendations
 - [ ] give info about how many attributes selected at the top of the pills (so user doesn't have to scroll down and count)
 - [ ] fix placement of playlist list modal in mobile
-- [ ] use events throughout to handle work e.g. raise event when currently playing has changed, listen to it to update controls
+- [ ] use events throughout to handle work e.g. raise event when currently playing has changed, listen to it to update view + controls
 - [ ] specify values for Spotify's other audio feature values
     - [ ] (multiple can be derived from a single user input e.g. instrumentalness and speechiness?)
-    - [ ] valence for Happiness
-    - [ ] tempo
-    - [ ] length
     - [ ] liveness
     - [ ] time signature
     - [ ] covers (is that possible?)
-- [ ] add "like" button to add to library
-- [ ] add button to add to a playlist
 - [ ] let user choose one of their playlists as a seed
+    - Ben Schaap asked for this, too!
 - [ ] show list of songs in queue
 - [ ] add ban button ("don't play this song again")
 - [ ] add song progress bar that user can drag to skip
 - [ ] disable recommendations button until user makes a change to config (keep track of config state)
 - [ ] allow user to specify language
 - [ ] allow user to specify date of release
-- [ ] show currently playing song
-    - [ ] with album artwork
-    - [ ] with year of release
-    - [ ] with a link to it on spotify
-- [ ] figure out how good of a job Spotify is doing at hitting the target audio features
-- [ ] do I need to randomize the recommendations? i get a lot of the same ones
-- [ ] use [nouislider](https://refreshless.com/nouislider/ have 2 knobs on sliders to allow custom range
-- [ ] add genres from Spotify's available genres: https://developer.spotify.com/documentation/web-api/reference/get-recommendation-genres
+- [ ] show release date of currently playing song
 - [ ] limit max selected genres to 5 (see Spotify's seed_genres in https://developer.spotify.com/documentation/web-api/reference/get-recommendations)
-- [ ] set default genres (e.g. any?) and use that in the code instead of randomly picking 5 of Spotify's genres
 - [ ] in `getRecommendations`: throw error if genres is empty or greater than 5 in length
-- [ ] in `getSpotifyWebAPIBearerToken`: cache token and expiry time; if called again, try to use cached token
-- [ ] fetch Spotify genres instead of having them hard-coded?
-    - [ ] or fetch them when an unexpected error happens when we request a genres and Spotify doesn't recognize it
-- [ ] special behavior for 'Any' genre pill/checkbox:
-    - [x] enable by default
-    - [ ] disable if any other is enabled
-    - [ ] enable again if all others are disabled
-- [ ] show audio feature values for currently playing track
