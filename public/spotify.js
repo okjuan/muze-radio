@@ -379,7 +379,6 @@ export function getAlbum(albumId) {
             return data;
         })
     )
-    .then(response => response.json())
     .catch(error => {
         console.debug(`Error occurred when fetching album with id=${albumId}: ${error}`);
         return undefined;
