@@ -6,6 +6,14 @@ import {
     sha256,
     wrapPromiseWithStatus,
 } from './utils.js';
+import {
+    cache,
+    cacheUserAuthData,
+    clearAuthCache,
+    getFromCache,
+    getUserAuthData,
+    removeFromCache,
+} from './cache.js';
 
 const clientId = '8efedd3d29214978b2a0e6e63444974b';
 export const spotifySeedGenres = ["acoustic", "afrobeat", "alt-rock", "alternative", "ambient", "anime", "black-metal", "bluegrass", "blues", "bossanova", "brazil", "breakbeat", "british", "cantopop", "chicago-house", "children", "chill", "classical", "club", "comedy", "country", "dance", "dancehall", "death-metal", "deep-house", "detroit-techno", "disco", "disney", "drum-and-bass", "dub", "dubstep", "edm", "electro", "electronic", "emo", "folk", "forro", "french", "funk", "garage", "german", "gospel", "goth", "grindcore", "groove", "grunge", "guitar", "happy", "hard-rock", "hardcore", "hardstyle", "heavy-metal", "hip-hop", "holidays", "honky-tonk", "house", "idm", "indian", "indie", "indie-pop", "industrial", "iranian", "j-dance", "j-idol", "j-pop", "j-rock", "jazz", "k-pop", "kids", "latin", "latino", "malay", "mandopop", "metal", "metal-misc", "metalcore", "minimal-techno", "movies", "mpb", "new-age", "new-release", "opera", "pagode", "party", "philippines-opm", "piano", "pop", "pop-film", "post-dubstep", "power-pop", "progressive-house", "psych-rock", "punk", "punk-rock", "r-n-b", "rainy-day", "reggae", "reggaeton", "road-trip", "rock", "rock-n-roll", "rockabilly", "romance", "sad", "salsa", "samba", "sertanejo", "show-tunes", "singer-songwriter", "ska", "sleep", "songwriter", "soul", "soundtracks", "spanish", "study", "summer", "swedish", "synth-pop", "tango", "techno", "trance", "trip-hop", "turkish", "work-out", "world-music"];
@@ -15,14 +23,12 @@ const maxSongsPerGetRecommendationsRequest = 100;
 export const maxSeedGenres = 5;
 var userPlaylists = undefined;
 var userId = undefined;
-const userAuthDataKey = "userAuthData";
-const expiryBufferInSeconds = 5;
 const redirectUri = 'https://okjuan.me/muze-radio';
 let userAuthDataPromise = undefined;
 const MARKET = 'US';
 
 export function getUserAuth(spotifyScopes) {
-    var userAuthData = JSON.parse(localStorage.getItem(userAuthDataKey));
+    var userAuthData = getUserAuthData();
     if (userAuthDataPromise && userAuthDataPromise.state === 'pending') {
         return userAuthDataPromise.promise;
     }
@@ -38,7 +44,9 @@ export function getUserAuth(spotifyScopes) {
             if (token) {
                 return token;
             }
+            userAuthDataPromise = undefined;
             clearAuthCache();
+            removeFromCache('code_verifier');
             const authRequest = requestToken(spotifyScopes);
             userAuthDataPromise = wrapPromiseWithStatus(authRequest);
             return authRequest;
@@ -51,7 +59,7 @@ function requestToken(spotifyScopes) {
     if (!window.location.search) {
         // Step 1: Generate a code verifier and a code challenge
         let codeVerifier = generateRandomString(128);
-        localStorage.setItem('code_verifier', codeVerifier);
+        cache('code_verifier', codeVerifier);
 
         sha256(codeVerifier).then((hash) => {
             // Step 2: Redirect the user to the authorization endpoint
@@ -76,7 +84,7 @@ function requestToken(spotifyScopes) {
             grant_type: 'authorization_code',
             code: authCode,
             redirect_uri: redirectUri,
-            code_verifier: localStorage.getItem('code_verifier'),
+            code_verifier: getFromCache('code_verifier'),
         }),
     })
     .then(response => response.json())
@@ -129,19 +137,6 @@ function refreshAccessToken(userAuthData) {
             return data;
         }
     });
-}
-
-function clearAuthCache() {
-    localStorage.removeItem(userAuthDataKey);
-    localStorage.removeItem('code_verifier');
-    userAuthDataPromise = undefined;
-}
-
-function cacheUserAuthData(userAuthData) {
-    // properties: access_token, token_type, scope, expires_in, refresh_token
-    const now = new Date().getTime();
-    userAuthData['expiresAt'] = now + (userAuthData['expires_in'] - expiryBufferInSeconds) * 1000;
-    localStorage.setItem(userAuthDataKey, JSON.stringify(userAuthData));
 }
 
 export function addSongsToPlaylist(playlistId, songUris, position=undefined) {
