@@ -352,8 +352,19 @@ export function getAlbum(albumId) {
                 'Authorization': `Bearer ${authToken}`
             },
         })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                throw new Error(data.error.message);
+            }
+            return data;
+        })
     )
-    .then(response => response.json());
+    .then(response => response.json())
+    .catch(error => {
+        console.debug(`Error occurred when fetching album with id=${albumId}: ${error}`);
+        return undefined;
+    });
 }
 
 export function getSong(songId) {

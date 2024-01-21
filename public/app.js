@@ -279,6 +279,10 @@ function updateCurrentlyPlayingAlbum(current_track) {
 
     const albumId = getIdFromUri(CURRENTLY_PLAYING.albumUri);
     getAlbum(albumId).then(album => {
+        if (!album) {
+            console.debug("Couldn't add link for currently playing album because no album found for id: " + albumId);
+            return;
+        }
         CURRENTLY_PLAYING.album = album;
         coverArtImg.className += " clickable";
         albumNameElement.className += " clickable";
