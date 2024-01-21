@@ -14,15 +14,16 @@ import {
     getUserAuthData,
     removeFromCache,
 } from './cache.js';
+import {
+    SPOTIFY_REDIRECT_URI,
+    SPOTIFY_APP_CLIENT_ID,
+    SPOTIFY_MAX_PLAYLISTS_PER_REQUEST,
+    SPOTIFY_MAX_SONGS_PER_ADD_TO_PLAYLIST_REQUEST,
+    SPOTIFY_MAX_SONGS_PER_GET_RECOMMENDATIONS_REQUEST,
+} from './constants.js';
 
-const clientId = '8efedd3d29214978b2a0e6e63444974b';
-export const maxPlaylistsPerRequest = 50;
-const maxSongsPerAddToPlaylistRequest = 100;
-const maxSongsPerGetRecommendationsRequest = 100;
-export const maxSeedGenres = 5;
 var userPlaylists = undefined;
 var userId = undefined;
-const redirectUri = 'https://okjuan.me/muze-radio';
 let userAuthDataPromise = undefined;
 const MARKET = 'US';
 let SPOTIFY_SEED_GENRES = undefined;
@@ -83,7 +84,7 @@ function requestToken(spotifyScopes) {
 
         sha256(codeVerifier).then((hash) => {
             // Step 2: Redirect the user to the authorization endpoint
-            let authUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}${spotifyScopes.length > 0 ? `&scope=${encodeURIComponent(spotifyScopes.join(' '))}` : ''}&code_challenge=${base64encode(hash)}&code_challenge_method=S256`;
+            let authUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${SPOTIFY_APP_CLIENT_ID}&redirect_uri=${encodeURIComponent(SPOTIFY_REDIRECT_URI)}${spotifyScopes.length > 0 ? `&scope=${encodeURIComponent(spotifyScopes.join(' '))}` : ''}&code_challenge=${base64encode(hash)}&code_challenge_method=S256`;
             window.location.href = authUrl;
         });
         return Promise.resolve(undefined);
@@ -100,10 +101,10 @@ function requestToken(spotifyScopes) {
             'Content-Type': 'application/x-www-form-urlencoded'
         },
         body: new URLSearchParams({
-            client_id: clientId,
+            client_id: SPOTIFY_APP_CLIENT_ID,
             grant_type: 'authorization_code',
             code: authCode,
-            redirect_uri: redirectUri,
+            redirect_uri: SPOTIFY_REDIRECT_URI,
             code_verifier: getFromCache('code_verifier'),
         }),
     })
@@ -140,7 +141,7 @@ function refreshAccessToken(userAuthData) {
         body: new URLSearchParams({
             grant_type: 'refresh_token',
             refresh_token: userAuthData.refresh_token,
-            client_id: clientId
+            client_id: SPOTIFY_APP_CLIENT_ID
         }),
     })
     .then(response => response.json())
@@ -161,7 +162,7 @@ function refreshAccessToken(userAuthData) {
 
 export function addSongsToPlaylist(playlistId, songUris, position=undefined) {
     const authScopes = ['playlist-modify-private', 'playlist-modify-public'];
-    const songUriBatches = chunkArray(songUris, maxSongsPerAddToPlaylistRequest);
+    const songUriBatches = chunkArray(songUris, SPOTIFY_MAX_SONGS_PER_ADD_TO_PLAYLIST_REQUEST);
     var songsAdded = 0;
     var requests = [];
     for (const songUriBatch of songUriBatches) {
@@ -181,7 +182,7 @@ export function addSongsToPlaylist(playlistId, songUris, position=undefined) {
 }
 
 export function getRecommendations(audioFeatures, genres) {
-    var queryParams = `seed_genres=${genres.join(',')}&limit=${maxSongsPerGetRecommendationsRequest}&market=${MARKET}`
+    var queryParams = `seed_genres=${genres.join(',')}&limit=${SPOTIFY_MAX_SONGS_PER_GET_RECOMMENDATIONS_REQUEST}&market=${MARKET}`
     queryParams += Object.entries(audioFeatures)
         .map(([audioFeature, parameters]) => `&${parameters.targetValue? `target_${audioFeature}=${parameters.targetValue}&` : ''}min_${audioFeature}=${parameters.minValue}&max_${audioFeature}=${parameters.maxValue}`)
         .join('&');
@@ -332,7 +333,7 @@ export function getUserPlaylists() {
     return (userPlaylists = getCurrentUserId().then(userId => {
         const editableByUser = (playlist) =>
             userId === playlist.owner.id || playlist.collaborative;
-        return getUserPlaylistsRecursively(0, maxPlaylistsPerRequest)
+        return getUserPlaylistsRecursively(0, SPOTIFY_MAX_PLAYLISTS_PER_REQUEST)
             .then((playlists) => playlists.filter(editableByUser));
     }));
 }

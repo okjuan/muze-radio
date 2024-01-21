@@ -9,7 +9,6 @@ import {
     getUserAuth,
     getUserPlaylists,
     isSavedToLikedSongs,
-    maxSeedGenres,
     playSongs,
     removeFromLikedSongs,
     saveToLikedSongs,
@@ -18,8 +17,8 @@ import {
 } from './spotify.js';
 import { arraysAreEqual, calculatePercentage, shuffleArray } from './utils.js';
 import { isFirstTimeUser } from './cache.js';
+import { SPOTIFY_MAX_SEED_GENRES, SPOTIFY_SCOPES, USER_MESSAGE_TIMEOUT_MS } from './constants.js';
 
-var USER_MESSAGE_TIMEOUT_MS = 3000;
 var CURRENTLY_PLAYING = {
     artistNames: undefined,
     songName: undefined,
@@ -33,20 +32,6 @@ var CURRENTLY_PLAYING = {
     spotifyId: undefined,
 };
 var PLAYLIST_PICKER_SHOWING = false;
-export const SPOTIFY_SCOPES = [
-    'streaming',
-    'user-read-private',
-    'user-read-playback-state',
-    'user-read-currently-playing',
-    'user-read-email',
-    'user-modify-playback-state',
-    'user-library-read',
-    'user-library-modify',
-    'playlist-read-collaborative',
-    'playlist-read-private',
-    'playlist-modify-private',
-    'playlist-modify-public',
-];
 var HAS_USER_CLICKED_FIND_MUSIC = false;
 let RESOLVE_PLAYER_DEVICE_ID = undefined;
 
@@ -158,7 +143,7 @@ const setUpRecommendationsButtonListener = (player) => {
         this.disabled = true;
         const audioFeatures = getSpotifyAudioFeatureRanges();
         console.debug('audioFeatures', audioFeatures);
-        getSeedGenres(maxSeedGenres).then(genres => {
+        getSeedGenres(SPOTIFY_MAX_SEED_GENRES).then(genres => {
             console.debug('genres', genres);
             requestRecommendationsUntilFound(audioFeatures, genres).then(recommendations => {
                 console.debug('recommendations', recommendations);
