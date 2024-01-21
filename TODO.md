@@ -18,7 +18,6 @@ backlog:
 - [ ] [optimization] parallelize requests to fetch all user's playlists
 - [ ] [optimization] check for OPTIONS requests and remove them as (e.g. `application/json` request(?) types cause them)
 - [ ] support multiple cached access tokens at once with different scopes
-- [ ] code style: use `.property` access notation everywhere rather than `['property']` notation
 - [ ] fix layout which got messed up by my adding heart and plus buttons, which leak out of `currently-playing-right` div
 - add to playlist:
     - [ ] **interesting**: consider having playlist modal open all the time as a side-view

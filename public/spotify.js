@@ -73,7 +73,7 @@ export function getUserAuth(spotifyScopes) {
             return authRequest;
         });
     }
-    return Promise.resolve(userAuthData['access_token']);
+    return Promise.resolve(userAuthData.access_token);
 }
 
 function requestToken(spotifyScopes) {
@@ -112,7 +112,7 @@ function requestToken(spotifyScopes) {
     .then(data => {
         console.log("Got token from user auth", data);
         cacheUserAuthData(data);
-        return data['access_token'];
+        return data.access_token;
     });
 }
 
@@ -120,7 +120,7 @@ const shouldPromptForUserAuth = (userAuthData, scopes) => {
     if (!userAuthData) {
         console.log('No token found');
         return true;
-    } else if (!isSubsetOf(userAuthData['scope'], scopes)) {
+    } else if (!isSubsetOf(userAuthData.scope, scopes)) {
         console.log('New scopes requested');
         return true;
     }
@@ -129,7 +129,7 @@ const shouldPromptForUserAuth = (userAuthData, scopes) => {
 
 function shouldRenewToken(userAuthData) {
     const now = new Date().getTime();
-    return userAuthData['expiresAt'] < now;
+    return userAuthData.expiresAt < now;
 }
 
 function refreshAccessToken(userAuthData) {

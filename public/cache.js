@@ -16,7 +16,7 @@ export function clearAuthCache() {
 export function cacheUserAuthData(userAuthData) {
     // properties: access_token, token_type, scope, expires_in, refresh_token
     const now = new Date().getTime();
-    userAuthData['expiresAt'] = now + (userAuthData['expires_in'] - EXPIRY_BUFFER_IN_SECONDS) * 1000;
+    userAuthData.expiresAt = now + (userAuthData.expires_in - EXPIRY_BUFFER_IN_SECONDS) * 1000;
     localStorage.setItem(USER_AUTH_DATA_KEY, JSON.stringify(userAuthData));
 }
 

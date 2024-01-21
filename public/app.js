@@ -106,23 +106,23 @@ const onPlayerStateChanged = (args) => {
         return;
     }
     var currentPlayingUpdated = false;
-    if (CURRENTLY_PLAYING.spotifyId != current_track['id']) {
-        CURRENTLY_PLAYING.spotifyId = current_track['id'];
+    if (CURRENTLY_PLAYING.spotifyId != current_track.id) {
+        CURRENTLY_PLAYING.spotifyId = current_track.id;
         currentPlayingUpdated = true;
     }
-    if (CURRENTLY_PLAYING.spotifyUri != current_track['uri']) {
-        CURRENTLY_PLAYING.spotifyUri = current_track['uri'];
+    if (CURRENTLY_PLAYING.spotifyUri != current_track.uri) {
+        CURRENTLY_PLAYING.spotifyUri = current_track.uri;
         currentPlayingUpdated = true;
     }
-    if (!arraysAreEqual(CURRENTLY_PLAYING.artistUris ?? [], current_track['artists'].map(a => a.uri))) {
+    if (!arraysAreEqual(CURRENTLY_PLAYING.artistUris ?? [], current_track.artists.map(a => a.uri))) {
         updateCurrentlyPlayingArtists(current_track);
         currentPlayingUpdated = true;
     }
-    if (CURRENTLY_PLAYING.songUri != current_track['uri']) {
+    if (CURRENTLY_PLAYING.songUri != current_track.uri) {
         updateCurrentlyPlayingSong(current_track);
         currentPlayingUpdated = true;
     }
-    if (CURRENTLY_PLAYING.albumUri != current_track['album']['uri']) {
+    if (CURRENTLY_PLAYING.albumUri != current_track.album.uri) {
         updateCurrentlyPlayingAlbum(current_track);
         currentPlayingUpdated = true;
     }
@@ -149,7 +149,7 @@ const setUpRecommendationsButtonListener = (player) => {
                 console.debug('recommendations', recommendations);
                 if (recommendations.tracks.length > 0) {
                     player.getDeviceId.then(device_id => {
-                        playSongs(device_id, shuffleArray(recommendations['tracks'].map(track => track.uri)));
+                        playSongs(device_id, shuffleArray(recommendations.tracks.map(track => track.uri)));
                         document.getElementById('recommendations-button-icon').className = "fa-solid fa-magnifying-glass";
                     });
                 }
@@ -230,13 +230,13 @@ function enablePlayerButtons() {
 }
 
 function updateCurrentlyPlayingArtists(current_track) {
-    CURRENTLY_PLAYING.artistUris = current_track['artists'].map(a => a.uri);
-    CURRENTLY_PLAYING.artistNames = current_track['artists']
+    CURRENTLY_PLAYING.artistUris = current_track.artists.map(a => a.uri);
+    CURRENTLY_PLAYING.artistNames = current_track.artists
         .map(artist => artist.name)
         .join(', ');
     const artistNameElement = document.getElementById('artist-name-text');
     artistNameElement.textContent = ` ${CURRENTLY_PLAYING.artistNames}`;
-    const artistIds = current_track['artists'].map(a => getIdFromUri(a.uri));
+    const artistIds = current_track.artists.map(a => getIdFromUri(a.uri));
     getArtists(artistIds)
     .then(artists => addSpotifyLinksToArtistNames(artists))
     .catch((error) => {
@@ -252,11 +252,11 @@ function updateCurrentlyPlayingArtists(current_track) {
 }
 
 function updateCurrentlyPlayingSong(current_track) {
-    CURRENTLY_PLAYING.songName = current_track['name'];
-    CURRENTLY_PLAYING.songUri = current_track['uri'];
+    CURRENTLY_PLAYING.songName = current_track.name;
+    CURRENTLY_PLAYING.songUri = current_track.uri;
     const songNameElement = document.getElementById('song-name-text');
-    songNameElement.textContent = ` ${current_track['name']}`;
-    getSong(current_track['id']).then(song => {
+    songNameElement.textContent = ` ${current_track.name}`;
+    getSong(current_track.id).then(song => {
         if (!song) {
             console.debug("Couldn't add link for currently playing song because no song found for track id: " + current_track.id);
             return;
@@ -274,13 +274,13 @@ function updateCurrentlyPlayingSong(current_track) {
 }
 
 function updateCurrentlyPlayingAlbum(current_track) {
-    CURRENTLY_PLAYING.albumUri = current_track['album']['uri'];
-    CURRENTLY_PLAYING.albumName = current_track['album']['name'];
+    CURRENTLY_PLAYING.albumUri = current_track.album.uri;
+    CURRENTLY_PLAYING.albumName = current_track.album.name;
     const albumNameElement = document.getElementById('album-name-text');
     albumNameElement.textContent = ` ${CURRENTLY_PLAYING.albumName}`;
 
     const coverArtImg = document.getElementById('cover-art');
-    setCoverArt(coverArtImg, current_track['album']['images']);
+    setCoverArt(coverArtImg, current_track.album.images);
 
     const albumId = getIdFromUri(CURRENTLY_PLAYING.albumUri);
     getAlbum(albumId).then(album => {
@@ -404,7 +404,7 @@ function showPlaylistPicker(playlists) {
     const existingPlaylistIds = existingPlaylists
         .map(playlistElement => playlistElement.dataset.playlistId);
     const newPlaylists = playlists
-        .filter(playlist => !existingPlaylistIds.includes(playlist['id']))
+        .filter(playlist => !existingPlaylistIds.includes(playlist.id))
         .sort((playlist1, playlist2) => playlist1.name.localeCompare(playlist2.name))
         .map(playlist => {
             const playlistListItem = document.createElement('div');
@@ -418,7 +418,7 @@ function showPlaylistPicker(playlists) {
                 playlistName.textContent = "";
                 const playlistIcon = document.getElementById(`playlist-list-item-icon-${playlist.id}`);
                 playlistIcon.className = "fa-solid fa-spinner fa-spin";
-                addSongsToPlaylist(playlist['id'], [CURRENTLY_PLAYING.spotifyUri], 0)
+                addSongsToPlaylist(playlist.id, [CURRENTLY_PLAYING.spotifyUri], 0)
                 .then(() => {
                     showMessageToUser(`Track '${CURRENTLY_PLAYING.songName}' added to playlist '${playlist.name}'`);
                     playlistIcon.className = "fa-solid fa-check";
@@ -438,7 +438,7 @@ function showPlaylistPicker(playlists) {
             newPlaylistIcon.id = `playlist-list-item-icon-${playlist.id}`;
 
             playlistListItem.className = 'playlist-list-item';
-            playlistListItem.dataset.playlistId = playlist['id'];
+            playlistListItem.dataset.playlistId = playlist.id;
 
             playlistListItem.append(playlistName, newPlaylistIcon);
             return playlistListItem;
