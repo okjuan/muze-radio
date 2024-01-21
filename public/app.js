@@ -48,7 +48,10 @@ export const SPOTIFY_SCOPES = [
     'playlist-modify-public',
 ];
 var HAS_USER_CLICKED_FIND_MUSIC = false;
+let RESOLVE_PLAYER_DEVICE_ID = undefined;
 
+// immediately start auth process, which may require us to prompt user for permission
+// or to request refresh of token in the background
 getUserAuth(SPOTIFY_SCOPES);
 
 window.onSpotifyWebPlaybackSDKReady = () => {
@@ -57,30 +60,11 @@ window.onSpotifyWebPlaybackSDKReady = () => {
       getOAuthToken: cb => { cb(getUserAuth(SPOTIFY_SCOPES)); }
   });
 
-  let resolveDeviceId;
   player.getDeviceId = new Promise((resolve) => {
-    resolveDeviceId = resolve;
+    RESOLVE_PLAYER_DEVICE_ID = resolve;
   });
 
-  player.addListener('ready', ({ device_id }) => {
-    console.log('Ready with Device ID', device_id);
-    resolveDeviceId(device_id);
-    transferPlayback(device_id).then(() => {
-        enablePlayerButtons();
-        setTimeout(() => {
-            if (!HAS_USER_CLICKED_FIND_MUSIC && isFirstTimeUser()) {
-                showMessageToUser("Click 'Find Music' to start exploring!");
-            }
-        }, 5000);
-        setTimeout(() => {
-            if (!HAS_USER_CLICKED_FIND_MUSIC) {
-                showMessageToUser("Click 'Find Music' to start exploring!");
-            }
-        }, 15000);
-        console.debug("Pre-fetching user's playlists...");
-        getUserPlaylists().then(() => console.debug("Done fetching user's playlists!"));
-    });
-  });
+  player.addListener('ready', onPlayerReady);
 
   player.addListener('not_ready', ({ device_id }) => {
     console.log('Device ID has gone offline', device_id);
@@ -139,9 +123,34 @@ window.onSpotifyWebPlaybackSDKReady = () => {
 
   player.connect();
 
-  const generateRecommendationsButton = document.getElementById('recommendations-button');
-  generateRecommendationsButton.disabled = true;
-  generateRecommendationsButton.onclick = function() {
+  setUpRecommendationsButtonListener(player);
+  setUpPlayerControlButtons(player);
+};
+
+const onPlayerReady = ({ device_id }) => {
+    console.log('Ready with Device ID', device_id);
+    RESOLVE_PLAYER_DEVICE_ID(device_id);
+    transferPlayback(device_id).then(() => {
+        enablePlayerButtons();
+        setTimeout(() => {
+            if (!HAS_USER_CLICKED_FIND_MUSIC && isFirstTimeUser()) {
+                showMessageToUser("Click 'Find Music' to start exploring!");
+            }
+        }, 5000);
+        setTimeout(() => {
+            if (!HAS_USER_CLICKED_FIND_MUSIC) {
+                showMessageToUser("Click 'Find Music' to start exploring!");
+            }
+        }, 15000);
+        console.debug("Pre-fetching user's playlists...");
+        getUserPlaylists().then(() => console.debug("Done fetching user's playlists!"));
+    });
+}
+
+const setUpRecommendationsButtonListener = (player) => {
+    const generateRecommendationsButton = document.getElementById('recommendations-button');
+    generateRecommendationsButton.disabled = true;
+    generateRecommendationsButton.onclick = function() {
     HAS_USER_CLICKED_FIND_MUSIC = true;
     document.getElementById('recommendations-button-icon').className = "fa-solid fa-spinner fa-spin";
     this.disabled = true;
@@ -159,49 +168,57 @@ window.onSpotifyWebPlaybackSDKReady = () => {
         }
     });
     this.disabled = false;
-  };
+    };
+}
 
-  const playPauseButton = document.getElementById('play-pause-button');
-  playPauseButton.onclick = function() {
-    player.togglePlay();
-  };
+const setUpPlayerControlButtons = (player) => {
+    const playPauseButton = document.getElementById('play-pause-button');
+    playPauseButton.onclick = function() {
+        player.togglePlay();
+    };
 
-  const skipButton = document.getElementById('next-button');
-  skipButton.onclick = function() {
-      player.nextTrack();
-  };
+    const skipButton = document.getElementById('next-button');
+    skipButton.onclick = function() {
+        player.nextTrack();
+    };
 
-  const previousButton = document.getElementById('previous-button');
-  previousButton.onclick = function() {
-      player.previousTrack();
-  };
+    const previousButton = document.getElementById('previous-button');
+    previousButton.onclick = function() {
+        player.previousTrack();
+    };
+    setUpLikeButton();
+    setUpAddToPlaylistButton();
+}
 
-  const likeButton = document.getElementById('like-button');
-  likeButton.onclick = function(event) {
-    const likeButtonIcon = event.target.id === "like-button-icon" ? event.target : event.target.querySelector('i');
-    likeButtonIcon.className = "fa-solid fa-spinner fa-spin";
-    isSavedToLikedSongs(CURRENTLY_PLAYING.spotifyId).then(response => {
-        const isSavedToLikedSongs = response[0];
-        if (isSavedToLikedSongs) {
-            removeFromLikedSongs(CURRENTLY_PLAYING.spotifyId).then(() => {
-                likeButtonIcon.className = "fa-regular fa-heart";
-                showMessageToUser("Removed from Liked Songs");
-            });
-        } else {
-            saveToLikedSongs(CURRENTLY_PLAYING.spotifyId).then(() => {
-                likeButtonIcon.className = "fa-solid fa-heart";
-                showMessageToUser("Added to Liked Songs");
-            });
-        }
-    }).catch((error) => {
-        console.error("Error occurred when handling button click on like button:" + error);
-        likeButtonIcon.className = "fa-regular fa-heart";
-        showMessageToUser("Sorry, that didn't work. Please try again later.");
-    });
-  };
+const setUpLikeButton = () => {
+    const likeButton = document.getElementById('like-button');
+    likeButton.onclick = function(event) {
+        const likeButtonIcon = event.target.id === "like-button-icon" ? event.target : event.target.querySelector('i');
+        likeButtonIcon.className = "fa-solid fa-spinner fa-spin";
+        isSavedToLikedSongs(CURRENTLY_PLAYING.spotifyId).then(response => {
+            const isSavedToLikedSongs = response[0];
+            if (isSavedToLikedSongs) {
+                removeFromLikedSongs(CURRENTLY_PLAYING.spotifyId).then(() => {
+                    likeButtonIcon.className = "fa-regular fa-heart";
+                    showMessageToUser("Removed from Liked Songs");
+                });
+            } else {
+                saveToLikedSongs(CURRENTLY_PLAYING.spotifyId).then(() => {
+                    likeButtonIcon.className = "fa-solid fa-heart";
+                    showMessageToUser("Added to Liked Songs");
+                });
+            }
+        }).catch((error) => {
+            console.error("Error occurred when handling button click on like button:" + error);
+            likeButtonIcon.className = "fa-regular fa-heart";
+            showMessageToUser("Sorry, that didn't work. Please try again later.");
+        });
+    };
+}
 
-  const plusButton = document.getElementById('add-button');
-  plusButton.onclick = function() {
+const setUpAddToPlaylistButton = () => {
+    const plusButton = document.getElementById('add-button');
+    plusButton.onclick = function() {
         const addIcon = document.getElementById('add-button-icon');
         addIcon.className = "fa-solid fa-spinner fa-spin";
         getUserPlaylists().then(playlists => {
@@ -211,7 +228,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
             addIcon.className = "fa-solid fa-plus";
         });
     };
-};
+}
 
 function enablePlayerButtons() {
     document.getElementById('recommendations-button').disabled = false;
