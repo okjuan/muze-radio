@@ -82,7 +82,35 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     console.error(message);
   });
 
-  player.addListener('player_state_changed', (args) => {
+  player.addListener('player_state_changed', onPlayerStateChanged);
+
+  player.connect();
+
+  setUpRecommendationsButtonListener(player);
+  setUpPlayerControlButtons(player);
+};
+
+const onPlayerReady = ({ device_id }) => {
+  console.log('Ready with Device ID', device_id);
+  RESOLVE_PLAYER_DEVICE_ID(device_id);
+  transferPlayback(device_id).then(() => {
+    enablePlayerButtons();
+    setTimeout(() => {
+      if (!HAS_USER_CLICKED_FIND_MUSIC && isFirstTimeUser()) {
+        showMessageToUser("Click 'Find Music' to start exploring!");
+      }
+    }, 5000);
+    setTimeout(() => {
+      if (!HAS_USER_CLICKED_FIND_MUSIC) {
+        showMessageToUser("Click 'Find Music' to start exploring!");
+      }
+    }, 15000);
+    console.debug("Pre-fetching user's playlists...");
+    getUserPlaylists().then(() => console.debug("Done fetching user's playlists!"));
+  });
+}
+
+const onPlayerStateChanged = (args) => {
   if (args === null || args === undefined) {
     console.debug('player_state_changed event triggered but args is null or undefined -- returning early from handler');
     return;
@@ -119,32 +147,6 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     });
     updateCurrentlyPlayingAudioFeatures(current_track);
   }
-  });
-
-  player.connect();
-
-  setUpRecommendationsButtonListener(player);
-  setUpPlayerControlButtons(player);
-};
-
-const onPlayerReady = ({ device_id }) => {
-  console.log('Ready with Device ID', device_id);
-  RESOLVE_PLAYER_DEVICE_ID(device_id);
-  transferPlayback(device_id).then(() => {
-    enablePlayerButtons();
-    setTimeout(() => {
-      if (!HAS_USER_CLICKED_FIND_MUSIC && isFirstTimeUser()) {
-        showMessageToUser("Click 'Find Music' to start exploring!");
-      }
-    }, 5000);
-    setTimeout(() => {
-      if (!HAS_USER_CLICKED_FIND_MUSIC) {
-        showMessageToUser("Click 'Find Music' to start exploring!");
-      }
-    }, 15000);
-    console.debug("Pre-fetching user's playlists...");
-    getUserPlaylists().then(() => console.debug("Done fetching user's playlists!"));
-  });
 }
 
 const setUpRecommendationsButtonListener = (player) => {
