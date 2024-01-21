@@ -60,7 +60,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   let resolveDeviceId;
   player.getDeviceId = new Promise((resolve) => {
     resolveDeviceId = resolve;
-});
+  });
 
   player.addListener('ready', ({ device_id }) => {
     console.log('Ready with Device ID', device_id);
