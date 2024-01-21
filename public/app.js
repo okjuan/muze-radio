@@ -13,7 +13,7 @@ import {
     playSongs,
     removeFromLikedSongs,
     saveToLikedSongs,
-    spotifySeedGenres,
+    getSpotifySeedGenres,
     transferPlayback
 } from './spotify.js';
 import { arraysAreEqual, calculatePercentage, shuffleArray } from './utils.js';
@@ -153,24 +153,27 @@ const setUpRecommendationsButtonListener = (player) => {
     const generateRecommendationsButton = document.getElementById('recommendations-button');
     generateRecommendationsButton.disabled = true;
     generateRecommendationsButton.onclick = function() {
-    HAS_USER_CLICKED_FIND_MUSIC = true;
-    document.getElementById('recommendations-button-icon').className = "fa-solid fa-spinner fa-spin";
-    this.disabled = true;
-    const audioFeatures = getSpotifyAudioFeatureRanges();
-    console.debug('audioFeatures', audioFeatures);
-    const genres = getSeedGenres(maxSeedGenres);
-    console.debug('genres', genres);
-    requestRecommendationsUntilFound(audioFeatures, genres).then(recommendations => {
-        console.debug('recommendations', recommendations);
-        if (recommendations.tracks.length > 0) {
-            player.getDeviceId.then(device_id => {
-                playSongs(device_id, shuffleArray(recommendations['tracks'].map(track => track.uri)));
-                document.getElementById('recommendations-button-icon').className = "fa-solid fa-magnifying-glass";
+        HAS_USER_CLICKED_FIND_MUSIC = true;
+        document.getElementById('recommendations-button-icon').className = "fa-solid fa-spinner fa-spin";
+        this.disabled = true;
+        const audioFeatures = getSpotifyAudioFeatureRanges();
+        console.debug('audioFeatures', audioFeatures);
+        getSeedGenres(maxSeedGenres).then(genres => {
+            console.debug('genres', genres);
+            requestRecommendationsUntilFound(audioFeatures, genres).then(recommendations => {
+                console.debug('recommendations', recommendations);
+                if (recommendations.tracks.length > 0) {
+                    player.getDeviceId.then(device_id => {
+                        playSongs(device_id, shuffleArray(recommendations['tracks'].map(track => track.uri)));
+                        document.getElementById('recommendations-button-icon').className = "fa-solid fa-magnifying-glass";
+                    });
+                }
             });
-        }
-    });
-    this.disabled = false;
-    };
+            this.disabled = false;
+        }).catch((_) => {
+            this.disabled = false;
+        });
+    }
 }
 
 const setUpPlayerControlButtons = (player) => {
@@ -491,23 +494,25 @@ function requestRecommendationsUntilFound(audioFeatures, genres) {
 }
 
 const genresContainer = document.querySelector('.pills-container');
-spotifySeedGenres.forEach((genre, index) => {
-    if (!genresContainer.querySelector(`input[value="${genre}"]`)) {
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.id = genre;
-        checkbox.className = 'genre';
-        checkbox.value = genre;
-        checkbox.checked = index === 0;
+getSpotifySeedGenres().then(genres => {
+    genres.forEach((genre, index) => {
+        if (!genresContainer.querySelector(`input[value="${genre}"]`)) {
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = genre;
+            checkbox.className = 'genre';
+            checkbox.value = genre;
+            checkbox.checked = index === 0;
 
-        const label = document.createElement('label');
-        label.htmlFor = genre;
-        label.className = 'pill';
-        label.textContent = genre.charAt(0).toUpperCase() + genre.slice(1); // Capitalize genre
+            const label = document.createElement('label');
+            label.htmlFor = genre;
+            label.className = 'pill';
+            label.textContent = genre.charAt(0).toUpperCase() + genre.slice(1); // Capitalize genre
 
-        genresContainer.appendChild(checkbox);
-        genresContainer.appendChild(label);
-    }
+            genresContainer.appendChild(checkbox);
+            genresContainer.appendChild(label);
+        }
+    });
 });
 
 document.querySelectorAll('.slider-label-container').forEach((sliderLabelContainer, index) => {
@@ -542,15 +547,17 @@ function getSpotifyAudioFeatureRanges() {
 }
 
 function getSeedGenres(count) {
-    const selectedGenres = getSelectedGenres().filter(a => spotifySeedGenres.some(b => a.toLowerCase().trim() === b.toLowerCase().trim()));
-    var seedGenres;
-    if (selectedGenres.length > 0) {
-        seedGenres = selectedGenres.slice(0, count);
-    } else {
-        var shuffledspotifySeedGenres = spotifySeedGenres.sort(() => 0.5 - Math.random());
-        seedGenres = shuffledspotifySeedGenres.slice(0, count);
-    }
-    return seedGenres;
+    return getSpotifySeedGenres().then(spotifySeedGenres => {
+        const selectedGenres = getSelectedGenres().filter(a => spotifySeedGenres.some(b => a.toLowerCase().trim() === b.toLowerCase().trim()));
+        var seedGenres;
+        if (selectedGenres.length > 0) {
+            seedGenres = selectedGenres.slice(0, count);
+        } else {
+            var shuffledspotifySeedGenres = spotifySeedGenres.sort(() => 0.5 - Math.random());
+            seedGenres = shuffledspotifySeedGenres.slice(0, count);
+        }
+        return seedGenres;
+    });
 }
 
 function getSelectedGenres() {
