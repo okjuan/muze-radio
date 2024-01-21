@@ -480,6 +480,10 @@ function requestRecommendationsUntilFound(audioFeatures, genres) {
 
 const genresContainer = document.querySelector('.pills-container');
 getSpotifySeedGenres().then(genres => {
+    if (!genres) {
+        console.error("Couldn't set up genres because none were found!");
+        return;
+    }
     genres.forEach((genre, index) => {
         if (!genresContainer.querySelector(`input[value="${genre}"]`)) {
             const checkbox = document.createElement('input');

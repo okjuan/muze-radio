@@ -29,7 +29,7 @@ const MARKET = 'US';
 let SPOTIFY_SEED_GENRES = undefined;
 
 export function getSpotifySeedGenres() {
-    if (SPOTIFY_SEED_GENRES) {
+    if (SPOTIFY_SEED_GENRES || (SPOTIFY_SEED_GENRES = getFromCache('spotify_seed_genres')?.split(' '))) {
         return Promise.resolve(SPOTIFY_SEED_GENRES);
     }
     return getUserAuth([]).then(authToken =>
@@ -41,7 +41,10 @@ export function getSpotifySeedGenres() {
             },
         })
         .then(response => response.json())
-        .then(data => (SPOTIFY_SEED_GENRES = data.genres))
+        .then(data => {
+            cache('spotify_seed_genres', data.genres.join(' '));
+            return (SPOTIFY_SEED_GENRES = data.genres);
+        })
     ).catch(error => {
         console.debug(`Error occurred when fetching seed genres: ${error}`);
         return undefined;
