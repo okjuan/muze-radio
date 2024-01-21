@@ -250,6 +250,10 @@ function updateCurrentlyPlayingSong(current_track) {
     const songNameElement = document.getElementById('song-name-text');
     songNameElement.textContent = ` ${current_track['name']}`;
     getSong(current_track['id']).then(song => {
+        if (!song) {
+            console.debug("Couldn't add link for currently playing song because no song found for track id: " + current_track.id);
+            return;
+        }
         CURRENTLY_PLAYING.song = song;
         songNameElement.className += " clickable";
         songNameElement.onclick = () => {

@@ -365,8 +365,17 @@ export function getSong(songId) {
                 'Authorization': `Bearer ${authToken}`
             },
         })
-    )
-    .then(response => response.json());
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                throw new Error(data.error.message);
+            }
+            return data;
+        })
+    ).catch(error => {
+        console.debug(`Error occurred when fetching track with id=${songId}: ${error}`);
+        return undefined;
+    });
 }
 
 export function getArtists(artistIds) {
