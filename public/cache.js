@@ -4,7 +4,7 @@ const EXPIRY_BUFFER_IN_SECONDS = 5;
 export function isFirstTimeUser() {
   const hasUsedBefore = JSON.parse(localStorage.getItem('hasUsedBefore') || 'false');
   if (!hasUsedBefore) {
-    localStorage.setItem('hasUsedBefore', JSON.stringify(true));
+  localStorage.setItem('hasUsedBefore', JSON.stringify(true));
   }
   return !hasUsedBefore;
 }
