@@ -52,85 +52,92 @@
             </div>
          </div>
     </div>
-    <div id="recommendations-button-container">
-        <button id="recommendations-button"><i id="recommendations-button-icon" class="fa-solid fa-magnifying-glass"></i> Find Music</button>
-    </div>
-    <div class="main-container">
-        <div class="sliders-container">
-            <div class="slider-label-container">
-                <i id="popularity-checkbox" class="slider-checkbox fa-solid fa-square-check"></i>
-                <label>Popularity</label>
-            </div>
-            <div id="slider-input-container">
-                <i id="popularity-currently-playing-icon" class="slider-icon-currently-playing song-metadata-icon-currently-playing fa-solid fa-caret-down fa-beat-fade" style="display: none;"></i>
-                <input type="range" min="0" max="100" step="10" value="10" class="slider" name="popularity" id="popularity-input">
-            </div>
-            <div class="slider-label-container">
-                <i id="energy-checkbox" class="slider-checkbox fa-solid fa-square-check"></i>
-                <label>Energy</label>
-            </div>
-            <div id="slider-input-container">
-                <i id="energy-currently-playing-icon" class="slider-icon-currently-playing audio-feature-icon-currently-playing fa-solid fa-caret-down fa-beat-fade" style="display: none;"></i>
-                <input type="range" min="0" max="1" step="0.1" value="0.75" class="slider" name="energy" id="energy-input">
-            </div>
-            <div class="slider-label-container">
-                <i id="acousticness-checkbox" class="slider-checkbox fa-regular fa-square"></i>
-                <label>Acousticness</label>
-            </div>
-            <div id="slider-input-container">
-                <i id="acousticness-currently-playing-icon" class="slider-icon-currently-playing audio-feature-icon-currently-playing fa-solid fa-caret-down fa-beat-fade" style="display: none;"></i>
-                <input type="range" min="0" max="1" step="0.1" value="0.65" class="slider" name="acousticness" id="acousticness-input" disabled>
-            </div>
-            <div class="slider-label-container">
-                <i id="loudness-checkbox" class="slider-checkbox fa-regular fa-square"></i>
-                <label>Loudness</label>
-            </div>
-            <div id="slider-input-container">
-                <i id="loudness-currently-playing-icon" class="slider-icon-currently-playing audio-feature-icon-currently-playing fa-solid fa-caret-down fa-beat-fade" style="display: none;"></i>
-                <input type="range" min="-60" max="0" step="5" value="-30" class="slider" name="loudness" id="loudness-input" disabled>
-            </div>
-            <div class="slider-label-container">
-                <i id="instrumentalness-checkbox" class="slider-checkbox fa-regular fa-square"></i>
-                <label>Instrumentalness</label>
-            </div>
-            <div id="slider-input-container">
-                <i id="instrumentalness-currently-playing-icon" class="slider-icon-currently-playing audio-feature-icon-currently-playing fa-solid fa-caret-down fa-beat-fade" style="display: none;"></i>
-                <input type="range" min="0" max="1" step="0.1" value="0.5" class="slider" name="instrumentalness" id="instrumentalness-input" disabled>
-            </div>
-            <div class="slider-label-container">
-                <i id="tempo-checkbox" class="slider-checkbox fa-regular fa-square"></i>
-                <label>Tempo</label>
-            </div>
-            <div id="slider-input-container">
-                <i id="tempo-currently-playing-icon" class="slider-icon-currently-playing audio-feature-icon-currently-playing fa-solid fa-caret-down fa-beat-fade" style="display: none;"></i>
-                <input type="range" min="30" max="210" step="15" value="100" class="slider" name="tempo" id="tempo-input" disabled>
-            </div>
-            <div class="slider-label-container">
-                <i id="danceability-checkbox" class="slider-checkbox fa-regular fa-square"></i>
-                <label>Danceability</label>
-            </div>
-            <div id="slider-input-container">
-                <i id="danceability-currently-playing-icon" class="slider-icon-currently-playing audio-feature-icon-currently-playing fa-solid fa-caret-down fa-beat-fade" style="display: none;"></i>
-                <input type="range" min="0" max="1" step="0.1" value="0.5" class="slider" name="danceability" id="danceability-input" disabled>
-            </div>
-            <div class="slider-label-container">
-                <i id="valence-checkbox" class="slider-checkbox fa-regular fa-square"></i>
-                <label>Positivity</label>
-            </div>
-            <div id="slider-input-container">
-                <i id="valence-currently-playing-icon" class="slider-icon-currently-playing audio-feature-icon-currently-playing fa-solid fa-caret-down fa-beat-fade" style="display: none;"></i>
-                <input type="range" min="0" max="1" step="0.1" value="0.5" class="slider" name="valence" id="valence-input" disabled>
-            </div>
-            <div class="slider-label-container">
-                <i id="duration_ms-checkbox" class="slider-checkbox fa-regular fa-square"></i>
-                <label>Duration</label>
-            </div>
-            <div id="slider-input-container">
-                <i id="duration_ms-currently-playing-icon" class="slider-icon-currently-playing audio-feature-icon-currently-playing fa-solid fa-caret-down fa-beat-fade" style="display: none;"></i>
-                <input type="range" min="30000" max="900000" step="30000" value="210000" class="slider" name="duration_ms" id="duration_ms-input" disabled>
+    <div id="main-content-container">
+        <div id="sliders-section" class="main-content-section">
+            <div class="sliders-container">
+                <div class="slider-label-container">
+                    <i id="popularity-checkbox" class="slider-checkbox fa-solid fa-square-check"></i>
+                    <label>Popularity</label>
+                </div>
+                <div id="slider-input-container">
+                    <i id="popularity-currently-playing-icon" class="slider-icon-currently-playing song-metadata-icon-currently-playing fa-solid fa-caret-down fa-beat-fade" style="display: none;"></i>
+                    <input type="range" min="0" max="100" step="10" value="10" class="slider" name="popularity" id="popularity-input">
+                </div>
+                <div class="slider-label-container">
+                    <i id="energy-checkbox" class="slider-checkbox fa-solid fa-square-check"></i>
+                    <label>Energy</label>
+                </div>
+                <div id="slider-input-container">
+                    <i id="energy-currently-playing-icon" class="slider-icon-currently-playing audio-feature-icon-currently-playing fa-solid fa-caret-down fa-beat-fade" style="display: none;"></i>
+                    <input type="range" min="0" max="1" step="0.1" value="0.75" class="slider" name="energy" id="energy-input">
+                </div>
+                <div class="slider-label-container">
+                    <i id="acousticness-checkbox" class="slider-checkbox fa-regular fa-square"></i>
+                    <label>Acousticness</label>
+                </div>
+                <div id="slider-input-container">
+                    <i id="acousticness-currently-playing-icon" class="slider-icon-currently-playing audio-feature-icon-currently-playing fa-solid fa-caret-down fa-beat-fade" style="display: none;"></i>
+                    <input type="range" min="0" max="1" step="0.1" value="0.65" class="slider" name="acousticness" id="acousticness-input" disabled>
+                </div>
+                <div class="slider-label-container">
+                    <i id="loudness-checkbox" class="slider-checkbox fa-regular fa-square"></i>
+                    <label>Loudness</label>
+                </div>
+                <div id="slider-input-container">
+                    <i id="loudness-currently-playing-icon" class="slider-icon-currently-playing audio-feature-icon-currently-playing fa-solid fa-caret-down fa-beat-fade" style="display: none;"></i>
+                    <input type="range" min="-60" max="0" step="5" value="-30" class="slider" name="loudness" id="loudness-input" disabled>
+                </div>
+                <div class="slider-label-container">
+                    <i id="instrumentalness-checkbox" class="slider-checkbox fa-regular fa-square"></i>
+                    <label>Instrumentalness</label>
+                </div>
+                <div id="slider-input-container">
+                    <i id="instrumentalness-currently-playing-icon" class="slider-icon-currently-playing audio-feature-icon-currently-playing fa-solid fa-caret-down fa-beat-fade" style="display: none;"></i>
+                    <input type="range" min="0" max="1" step="0.1" value="0.5" class="slider" name="instrumentalness" id="instrumentalness-input" disabled>
+                </div>
+                <div class="slider-label-container">
+                    <i id="tempo-checkbox" class="slider-checkbox fa-regular fa-square"></i>
+                    <label>Tempo</label>
+                </div>
+                <div id="slider-input-container">
+                    <i id="tempo-currently-playing-icon" class="slider-icon-currently-playing audio-feature-icon-currently-playing fa-solid fa-caret-down fa-beat-fade" style="display: none;"></i>
+                    <input type="range" min="30" max="210" step="15" value="100" class="slider" name="tempo" id="tempo-input" disabled>
+                </div>
+                <div class="slider-label-container">
+                    <i id="danceability-checkbox" class="slider-checkbox fa-regular fa-square"></i>
+                    <label>Danceability</label>
+                </div>
+                <div id="slider-input-container">
+                    <i id="danceability-currently-playing-icon" class="slider-icon-currently-playing audio-feature-icon-currently-playing fa-solid fa-caret-down fa-beat-fade" style="display: none;"></i>
+                    <input type="range" min="0" max="1" step="0.1" value="0.5" class="slider" name="danceability" id="danceability-input" disabled>
+                </div>
+                <div class="slider-label-container">
+                    <i id="valence-checkbox" class="slider-checkbox fa-regular fa-square"></i>
+                    <label>Positivity</label>
+                </div>
+                <div id="slider-input-container">
+                    <i id="valence-currently-playing-icon" class="slider-icon-currently-playing audio-feature-icon-currently-playing fa-solid fa-caret-down fa-beat-fade" style="display: none;"></i>
+                    <input type="range" min="0" max="1" step="0.1" value="0.5" class="slider" name="valence" id="valence-input" disabled>
+                </div>
+                <div class="slider-label-container">
+                    <i id="duration_ms-checkbox" class="slider-checkbox fa-regular fa-square"></i>
+                    <label>Duration</label>
+                </div>
+                <div id="slider-input-container">
+                    <i id="duration_ms-currently-playing-icon" class="slider-icon-currently-playing audio-feature-icon-currently-playing fa-solid fa-caret-down fa-beat-fade" style="display: none;"></i>
+                    <input type="range" min="30000" max="900000" step="30000" value="210000" class="slider" name="duration_ms" id="duration_ms-input" disabled>
+                </div>
             </div>
         </div>
-        <div class="pills-container"></div>
+        <div id="recommendations-button-section" class="main-content-section">
+            <div id="recommendations-button-container">
+                <img id="secondary-spotify-icon" src="images/Spotify_Icon_RGB_Black.png" alt="Spotify Icon">
+                <button id="recommendations-button"><i id="recommendations-button-icon" class="fa-solid fa-magnifying-glass"></i> Find Music</button>
+            </div>
+        </div>
+        <div id="genres-artists-section" class="main-content-section">
+            <div class="pills-container"></div>
+        </div>
     </div>
 
     <script src="https://sdk.scdn.co/spotify-player.js"></script>

@@ -120,8 +120,18 @@ button:hover {
 }
 
 #spotify-icon {
-    height: 70px;
+    height: 50px;
     padding: 0px 10px;
+    flex: 1;
+}
+
+#secondary-spotify-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40px;
+    width: height;
+    /* padding: 0px 10px; */
     flex: 1;
 }
 
@@ -131,50 +141,21 @@ button:hover {
 }
 
 #spotify-logo-container {
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
 }
 
 #spotify-logo {
     height: 70px;
-    padding: 0px 10px;
-}
-
-@media (min-width: 600px) {
-    .music-control-button {
-        width: 35px;
-        height: 35px;
-    }
-    #currently-playing {
-        max-width: 75%;
-    }
-    #spotify-logo-container {
-        display: none;
-    }
-}
-
-@media (max-width: 599.99px) {
-    .music-control-button {
-        width: 30px;
-        height: 30px;
-    }
-    #currently-playing {
-        max-width: 90%;
-    }
-    #song-queue-container {
-        display: none;
-    }
-    #spotify-icon-container {
-        display: none;
-    }
-    #spotify-logo-container {
-        display: flex;
-    }
+    top: 35px;
+    padding-bottom: 35px;
 }
 
 #recommendations-button-container {
     padding: 3vh 0vw;
+    align-items: center;
+    display: flex;
 }
 
 #recommendations-button {
@@ -301,7 +282,7 @@ img#cover-art[src=""] {
 
 .sliders-container {
     width: auto;
-    max-width: 400px;
+    max-width: 90%;
     align-items: center;
 }
 
@@ -328,12 +309,12 @@ img#cover-art[src=""] {
     flex-wrap: wrap;
     gap: 10px;
     width: auto; /* Set a fixed width */
-    max-width: 50%;
+    max-width: 90%;
     height: 450px;
     overflow-x: auto; /* Enable horizontal scrolling */
     justify-content: center; /* Center the items horizontally */
     flex: 1;
-    padding: 0px 5vw;
+    padding: 0px 1vw;
 }
 
 .pills-container input[type="checkbox"] {
@@ -355,9 +336,29 @@ img#cover-art[src=""] {
     background-color: #92c5ff;
 }
 
-.main-container {
+#main-content-container {
     display: flex;
+    flex-direction: row;
     justify-content: space-between;
+    max-height: 78vh;
+}
+
+.main-content-section {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    flex: 3;
+    width: 100%;
+    gap: 10px;
+    max-height: 100%;
+    overflow-y: auto;
+}
+
+#recommendations-button-section {
+    flex: 1;
+    min-width: 175px;
 }
 
 .clickable:hover {
@@ -374,4 +375,43 @@ img#cover-art[src=""] {
     position: relative;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+@media (min-width: 600px) {
+    .music-control-button {
+        width: 35px;
+        height: 35px;
+    }
+    #currently-playing {
+        max-width: 75%;
+    }
+    #secondary-spotify-icon {
+        display: none;
+    }
+}
+
+@media (max-width: 599.99px) {
+    .slider {
+        margin-bottom: 0px;
+    }
+    .music-control-button {
+        width: 30px;
+        height: 30px;
+    }
+    #currently-playing {
+        max-width: 90%;
+    }
+    #song-queue-container {
+        display: none;
+    }
+    #spotify-icon-container {
+        display: none;
+    }
+    #secondary-spotify-icon {
+        display: inline-flex;
+        padding-right: 10px;
+    }
+    #main-content-container {
+        flex-direction: column;
+    }
 }
