@@ -77,8 +77,8 @@ window.onSpotifyWebPlaybackSDKReady = () => {
                 showMessageToUser("Click 'Find Music' to start exploring!");
             }
         }, 15000);
-        console.log("Pre-fetching user's playlists...");
-        getUserPlaylists().then(() => console.log("Done fetching user's playlists!"));
+        console.debug("Pre-fetching user's playlists...");
+        getUserPlaylists().then(() => console.debug("Done fetching user's playlists!"));
     });
   });
 
