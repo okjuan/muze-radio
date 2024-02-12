@@ -1,7 +1,6 @@
 high pri:
-- [ ] fix styling of song metadata when song/artist/album names are long (test with Classical music)
 - [ ] support filtering/searching of playlists in modal that appears when '+' (add to playlist) button clicked
-- [ ] show songs that are in queue
+- [ ] add song progress bar to allow user to jump to arbitrary position in currently playing track
 
 feature work: sliders
 - [ ] replace sliders with sliders with two controls that allow setting a range
@@ -11,6 +10,7 @@ feature work: sliders
 ---
 
 backlog:
+- [ ] [bug] when there are no songs "next", current song shows up as next in queue
 - [ ] [craft] vertically center checkboxes next to each slider label
 - [ ] [optimization] fetch audio features of all recommended songs at the same time and save them for use when they are played
 - [ ] [craft] disable (or debounce?) player control buttons after one is clicked, until corresponding operation (e.g. skip) completes
