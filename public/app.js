@@ -458,6 +458,24 @@ document.addEventListener('click', function(event) {
     }
 });
 
+var modal = document.getElementById('modal');
+var unlinkButton = document.getElementById('unlink-button');
+var closeButton = document.getElementById('close-button');
+
+unlinkButton.addEventListener('click', function() {
+    modal.style.display = "block";
+});
+
+closeButton.addEventListener('click', function() {
+    modal.style.display = "none";
+});
+
+window.addEventListener('click', function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+});
+
 function showPlaylistPicker(playlists) {
     const playlistListElement = document.getElementById('playlist-list');
     const existingPlaylists = Array.from(
